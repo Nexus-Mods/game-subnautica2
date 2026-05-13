@@ -107,3 +107,33 @@ export function openModsFile(api: types.IExtensionApi): void {
 export function openNexusPage(): void {
   opn(`https://www.nexusmods.com/${NEXUS_ID}`);
 }
+
+async function listModDirs(modsDir: string): Promise<string[]> {
+  let entries: string[];
+  try {
+    entries = await fs.readdirAsync(modsDir);
+  } catch {
+    return [];
+  }
+  const dirs: string[] = [];
+  for (const entry of entries) {
+    if (entry === 'mods.txt' || entry === 'mods.json') continue;
+    try {
+      const stat = (await fs.statAsync(`${modsDir}/${entry}`)) as { isDirectory: () => boolean };
+      if (stat.isDirectory()) dirs.push(entry);
+    } catch {
+      // ignore unreachable entries
+    }
+  }
+  return dirs;
+}
+
+export async function regenerateModsFile(api: types.IExtensionApi): Promise<void> {
+  const discovery = getDiscovery(api, GAME_ID);
+  if (!discovery?.path) return;
+  const isXbox = discovery.store === 'xbox';
+  const modsDir = resolveGamePath(discovery.path, ue4ssModsPath(isXbox), isXbox);
+  const dirs = await listModDirs(modsDir);
+  const content = dirs.map((d) => `${d} : 1`).join('\n') + (dirs.length > 0 ? '\n' : '');
+  await fs.writeFileAsync(`${modsDir}/mods.txt`, content);
+}

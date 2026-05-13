@@ -7,12 +7,15 @@ import {
   openInjectorFile,
   openModsFile,
   openNexusPage,
+  regenerateModsFile,
   ue4ssProxyAbsolutePath,
 } from '../src/util/ue4ssState';
 
 const mockedDiscovery = selectors.discoveryByGame as unknown as Mock;
 const mockedActive = selectors.activeGameId as unknown as Mock;
 const mockedStat = fs.statAsync as unknown as Mock;
+const mockedReaddir = fs.readdirAsync as unknown as Mock;
+const mockedWrite = fs.writeFileAsync as unknown as Mock;
 const mockedOpn = util.opn as unknown as Mock;
 
 interface FakeApi {
@@ -35,6 +38,8 @@ beforeEach(() => {
   mockedDiscovery.mockReset();
   mockedActive.mockReset();
   mockedStat.mockReset();
+  mockedReaddir.mockReset();
+  mockedWrite.mockReset();
   mockedOpn.mockReset();
 });
 
@@ -147,5 +152,53 @@ describe('openInjectorFile / openModsFile / openNexusPage', () => {
   test('openNexusPage navigates to the Subnautica 2 Nexus page', () => {
     openNexusPage();
     expect(mockedOpn).toHaveBeenCalledWith('https://www.nexusmods.com/subnautica2');
+  });
+});
+
+describe('regenerateModsFile', () => {
+  test('writes mods.txt listing each deployed Lua mod folder as enabled', async () => {
+    mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
+    mockedReaddir.mockResolvedValueOnce(['ModA', 'ModB', 'mods.txt']);
+    mockedStat.mockImplementation(((p: string) =>
+      Promise.resolve({ isDirectory: () => !p.endsWith('.txt') })) as never);
+    await regenerateModsFile(asExtensionApi(makeApi()));
+    expect(mockedWrite).toHaveBeenCalledTimes(1);
+    const call = mockedWrite.mock.calls[0] as [string, string];
+    expect(call[0]).toBe('/games/Subnautica2/Subnautica2/Binaries/Win64/ue4ss/Mods/mods.txt');
+    expect(call[1]).toBe('ModA : 1\nModB : 1\n');
+  });
+
+  test('writes an empty mods.txt when no mod folders exist', async () => {
+    mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
+    mockedReaddir.mockResolvedValueOnce([]);
+    await regenerateModsFile(asExtensionApi(makeApi()));
+    expect(mockedWrite).toHaveBeenCalledTimes(1);
+    const call = mockedWrite.mock.calls[0] as [string, string];
+    expect(call[1]).toBe('');
+  });
+
+  test('skips file entries (non-directories)', async () => {
+    mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
+    mockedReaddir.mockResolvedValueOnce(['RealMod', 'stray.lua']);
+    mockedStat.mockImplementation(((p: string) =>
+      Promise.resolve({ isDirectory: () => p.endsWith('RealMod') })) as never);
+    await regenerateModsFile(asExtensionApi(makeApi()));
+    const call = mockedWrite.mock.calls[0] as [string, string];
+    expect(call[1]).toBe('RealMod : 1\n');
+  });
+
+  test('is a no-op when the game is not discovered', async () => {
+    mockedDiscovery.mockReturnValue(undefined);
+    await regenerateModsFile(asExtensionApi(makeApi()));
+    expect(mockedWrite).not.toHaveBeenCalled();
+  });
+
+  test('writes mods.txt at the Xbox WinGDK location', async () => {
+    mockedDiscovery.mockReturnValue({ path: '/xbox/Subnautica2', store: 'xbox' });
+    mockedReaddir.mockResolvedValueOnce(['BPModLoaderMod']);
+    mockedStat.mockResolvedValue({ isDirectory: () => true } as never);
+    await regenerateModsFile(asExtensionApi(makeApi()));
+    const call = mockedWrite.mock.calls[0] as [string, string];
+    expect(call[0]).toBe('/xbox/Subnautica2/Binaries/WinGDK/ue4ss/Mods/mods.txt');
   });
 });

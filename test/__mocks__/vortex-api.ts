@@ -7,6 +7,7 @@ export const fs = {
   ensureDirAsync: vi.fn((_p: string) => Promise.resolve()),
   statAsync: vi.fn((_p: string) => Promise.resolve({ isDirectory: () => true })),
   readdirAsync: vi.fn((_p: string) => Promise.resolve([] as string[])),
+  writeFileAsync: vi.fn((_p: string, _content: string) => Promise.resolve()),
 };
 
 export const util = {

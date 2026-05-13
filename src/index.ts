@@ -29,6 +29,7 @@ import {
   openInjectorFile,
   openModsFile,
   openNexusPage,
+  regenerateModsFile,
 } from './util/ue4ssState';
 import { pakInstallerTest, pakInstall } from './installers/pakInstaller';
 import { logicModsInstallerTest, logicModsInstall } from './installers/logicModsInstaller';
@@ -119,6 +120,15 @@ function init(context: types.IExtensionContext): boolean {
     context.api.events.on('gamemode-activated', (gameId: string) => {
       if (gameId !== GAME_ID) return;
       void notifyIfUE4SSMissing(context.api);
+    });
+
+    context.api.onAsync('did-deploy', async () => {
+      if (!isThisGameActive(context.api)) return;
+      try {
+        await regenerateModsFile(context.api);
+      } catch (err) {
+        log('warn', 'Subnautica 2: failed to regenerate ue4ss/Mods/mods.txt', err as Error);
+      }
     });
   });
 
