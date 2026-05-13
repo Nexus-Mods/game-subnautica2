@@ -16,13 +16,20 @@ import {
   MOD_TYPE_ROOT,
   MOD_TYPE_CONTENT_FOLDER,
   MOD_TYPE_PAK_ALT,
+  UE4SS_SETTINGS_FILE,
   IGNORE_CONFLICTS,
   IGNORE_DEPLOY,
   checkConstantsResolved,
 } from './constants';
 import { prepareForModding, IDiscovery } from './game';
 import { registerModTypes } from './modTypes';
-import { notifyIfUE4SSMissing } from './util/ue4ssState';
+import {
+  isThisGameActive,
+  notifyIfUE4SSMissing,
+  openInjectorFile,
+  openModsFile,
+  openNexusPage,
+} from './util/ue4ssState';
 import { pakInstallerTest, pakInstall } from './installers/pakInstaller';
 import { logicModsInstallerTest, logicModsInstall } from './installers/logicModsInstaller';
 import { ue4ssInstallerTest, ue4ssInstall } from './installers/ue4ssInstaller';
@@ -62,6 +69,34 @@ function init(context: types.IExtensionContext): boolean {
   });
 
   registerModTypes(context);
+
+  context.registerAction(
+    'mod-icons',
+    200,
+    'open-ext',
+    {},
+    'Open UE4SS Settings INI',
+    () => openInjectorFile(context.api, UE4SS_SETTINGS_FILE),
+    () => isThisGameActive(context.api),
+  );
+  context.registerAction(
+    'mod-icons',
+    201,
+    'open-ext',
+    {},
+    'Open UE4SS mods.txt',
+    () => openModsFile(context.api),
+    () => isThisGameActive(context.api),
+  );
+  context.registerAction(
+    'mod-icons',
+    202,
+    'open-ext',
+    {},
+    'Open Nexus Page',
+    () => openNexusPage(),
+    () => isThisGameActive(context.api),
+  );
 
   context.registerInstaller(MOD_TYPE_UE4SS_INJECTOR, 15, ue4ssInjectorTest as never, ue4ssInjectorInstall as never);
   context.registerInstaller(MOD_TYPE_LOGICMODS, 20, logicModsInstallerTest as never, logicModsInstall as never);
