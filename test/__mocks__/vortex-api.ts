@@ -13,6 +13,7 @@ export const util = {
   GameStoreHelper: {
     findByAppId: vi.fn(),
   },
+  opn: vi.fn((_url: string) => Promise.resolve()),
   getSafe: <T>(obj: unknown, path: readonly (string | number)[], fallback: T): T => {
     let cur: unknown = obj;
     for (const seg of path) {
@@ -27,8 +28,8 @@ export const util = {
 };
 
 export const selectors = {
-  activeGameId: vi.fn(),
-  discoveryByGame: vi.fn(),
+  activeGameId: vi.fn<(state: unknown) => string | undefined>(),
+  discoveryByGame: vi.fn<(state: unknown, gameId: string) => { path?: string; store?: string } | undefined>(),
 };
 
 export const actions = {};

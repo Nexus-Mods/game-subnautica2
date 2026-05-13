@@ -17,6 +17,7 @@ import {
 } from './constants';
 import { prepareForModding, IDiscovery } from './game';
 import { registerModTypes } from './modTypes';
+import { notifyIfUE4SSMissing } from './util/ue4ssState';
 import { pakInstallerTest, pakInstall } from './installers/pakInstaller';
 import { logicModsInstallerTest, logicModsInstall } from './installers/logicModsInstaller';
 import { ue4ssInstallerTest, ue4ssInstall } from './installers/ue4ssInstaller';
@@ -66,6 +67,11 @@ function init(context: types.IExtensionContext): boolean {
           'Update src/constants.ts after verifying values on an actual install.',
       );
     }
+
+    context.api.events.on('gamemode-activated', (gameId: string) => {
+      if (gameId !== GAME_ID) return;
+      void notifyIfUE4SSMissing(context.api);
+    });
   });
 
   return true;

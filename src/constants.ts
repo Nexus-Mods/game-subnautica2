@@ -32,6 +32,8 @@ export const UE4SS_DWMAPI_FILE = 'dwmapi.dll';
 export const UE4SS_XINPUT_FILE = 'xinput1_4.dll';
 export const UE4SS_SETTINGS_FILE = 'UE4SS-settings.ini';
 
+export const UE4SS_RELEASES_URL = 'https://github.com/UE4SS-RE/RE-UE4SS/releases';
+
 export interface ResolvedConstantsCheck {
   resolved: boolean;
   missing: string[];
