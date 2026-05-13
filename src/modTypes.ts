@@ -1,13 +1,7 @@
 import Bluebird from 'bluebird';
 import { types } from 'vortex-api';
-import {
-  GAME_ID,
-  MOD_TYPE_LOGICMODS,
-  MOD_TYPE_UE4SS,
-  LOGIC_MODS_RELPATH,
-  UE4SS_MODS_RELPATH,
-} from './constants';
-import { resolveGamePath } from './game';
+import { GAME_ID, LOGIC_MODS_RELPATH, MOD_TYPE_LOGICMODS, MOD_TYPE_UE4SS } from './constants';
+import { resolveGamePath, ue4ssModsPath } from './game';
 import type { IInstruction } from './installers/types';
 
 const isThisGame = (gameId: string): boolean => gameId === GAME_ID;
@@ -16,9 +10,13 @@ interface GameWithDiscovery {
   discovery?: { path?: string; store?: string };
 }
 
-function modPathFor(game: unknown, rel: string): string {
+type RelPath = string | ((isXbox: boolean) => string);
+
+function modPathFor(game: unknown, relPath: RelPath): string {
   const disc = (game as GameWithDiscovery).discovery;
-  return resolveGamePath(disc?.path ?? '', rel, disc?.store === 'xbox');
+  const isXbox = disc?.store === 'xbox';
+  const rel = typeof relPath === 'function' ? relPath(isXbox) : relPath;
+  return resolveGamePath(disc?.path ?? '', rel, isXbox);
 }
 
 export function isTypeMatch(typeId: string, instructions: readonly IInstruction[]): boolean {
@@ -40,7 +38,7 @@ export function registerModTypes(context: types.IExtensionContext): void {
     MOD_TYPE_UE4SS,
     22,
     isThisGame,
-    (game) => modPathFor(game, UE4SS_MODS_RELPATH),
+    (game) => modPathFor(game, ue4ssModsPath),
     ((instructions: readonly IInstruction[]) =>
       Bluebird.resolve(isTypeMatch(MOD_TYPE_UE4SS, instructions))) as never,
     { name: 'UE4SS (Lua scripts)', mergeMods: true },

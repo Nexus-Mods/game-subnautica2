@@ -1,5 +1,11 @@
 import { fs } from 'vortex-api';
-import { INSTALL_DIR, PAK_MODS_RELPATH, LOGIC_MODS_RELPATH, UE4SS_MODS_RELPATH } from './constants';
+import {
+  ARCH_WIN64,
+  ARCH_WINGDK,
+  INSTALL_DIR,
+  LOGIC_MODS_RELPATH,
+  PAK_MODS_RELPATH,
+} from './constants';
 import { joinRel } from './util/paths';
 
 export interface IDiscovery {
@@ -11,6 +17,18 @@ export interface IResolvedModPaths {
   pak: string;
   logicMods: string;
   ue4ss: string;
+}
+
+export function resolveArchDir(isXbox: boolean): string {
+  return isXbox ? ARCH_WINGDK : ARCH_WIN64;
+}
+
+export function ue4ssInjectorPath(isXbox: boolean): string {
+  return `${INSTALL_DIR}/Binaries/${resolveArchDir(isXbox)}`;
+}
+
+export function ue4ssModsPath(isXbox: boolean): string {
+  return `${ue4ssInjectorPath(isXbox)}/ue4ss/Mods`;
 }
 
 export function resolveGamePath(gamePath: string, rel: string, isXbox: boolean): string {
@@ -25,7 +43,7 @@ export function resolveModPaths(discovery: IDiscovery): IResolvedModPaths {
   return {
     pak: resolveGamePath(discovery.path, PAK_MODS_RELPATH, isXbox),
     logicMods: resolveGamePath(discovery.path, LOGIC_MODS_RELPATH, isXbox),
-    ue4ss: resolveGamePath(discovery.path, UE4SS_MODS_RELPATH, isXbox),
+    ue4ss: resolveGamePath(discovery.path, ue4ssModsPath(isXbox), isXbox),
   };
 }
 

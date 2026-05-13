@@ -1,5 +1,11 @@
 import { vi } from 'vitest';
-import { resolveModPaths, prepareForModding } from '../src/game';
+import {
+  prepareForModding,
+  resolveArchDir,
+  resolveModPaths,
+  ue4ssInjectorPath,
+  ue4ssModsPath,
+} from '../src/game';
 import { fs } from 'vortex-api';
 
 describe('resolveModPaths', () => {
@@ -21,7 +27,7 @@ describe('resolveModPaths', () => {
     const paths = resolveModPaths({ path: '/xbox/Subnautica2', store: 'xbox' });
     expect(paths.pak).toBe('/xbox/Subnautica2/Content/Paks/~mods');
     expect(paths.logicMods).toBe('/xbox/Subnautica2/Content/Paks/LogicMods');
-    expect(paths.ue4ss).toBe('/xbox/Subnautica2/Binaries/Win64/ue4ss/Mods');
+    expect(paths.ue4ss).toBe('/xbox/Subnautica2/Binaries/WinGDK/ue4ss/Mods');
   });
 
   test('discovery without a store defaults to nested INSTALL_DIR layout', () => {
@@ -45,5 +51,42 @@ describe('prepareForModding', () => {
 
   test('rejects when discovery.path is missing', async () => {
     await expect(prepareForModding({ path: undefined as unknown as string })).rejects.toThrow(/discovery/i);
+  });
+});
+
+describe('resolveArchDir', () => {
+  test('Steam/Epic resolves to Win64', () => {
+    expect(resolveArchDir(false)).toBe('Win64');
+  });
+
+  test('Xbox resolves to WinGDK', () => {
+    expect(resolveArchDir(true)).toBe('WinGDK');
+  });
+});
+
+describe('ue4ssInjectorPath', () => {
+  test('Steam path puts Binaries under INSTALL_DIR with Win64 arch', () => {
+    expect(ue4ssInjectorPath(false)).toBe('Subnautica2/Binaries/Win64');
+  });
+
+  test('Xbox path uses WinGDK arch', () => {
+    expect(ue4ssInjectorPath(true)).toBe('Subnautica2/Binaries/WinGDK');
+  });
+});
+
+describe('ue4ssModsPath', () => {
+  test('Steam path nests ue4ss/Mods under Binaries/Win64', () => {
+    expect(ue4ssModsPath(false)).toBe('Subnautica2/Binaries/Win64/ue4ss/Mods');
+  });
+
+  test('Xbox path nests ue4ss/Mods under Binaries/WinGDK', () => {
+    expect(ue4ssModsPath(true)).toBe('Subnautica2/Binaries/WinGDK/ue4ss/Mods');
+  });
+});
+
+describe('resolveModPaths (Xbox arch)', () => {
+  test('UE4SS path uses WinGDK on Xbox and strips the INSTALL_DIR prefix', () => {
+    const paths = resolveModPaths({ path: '/xbox/Subnautica2', store: 'xbox' });
+    expect(paths.ue4ss).toBe('/xbox/Subnautica2/Binaries/WinGDK/ue4ss/Mods');
   });
 });

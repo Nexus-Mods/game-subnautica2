@@ -16,9 +16,12 @@ export const XBOX_PFN: string | null = null;
 export const INSTALL_DIR = 'Subnautica2';
 export const EXEC = 'Subnautica2.exe';
 
+export const ARCH_WIN64 = 'Win64';
+export const ARCH_WINGDK = 'WinGDK';
+
 export const PAK_MODS_RELPATH = `${INSTALL_DIR}/Content/Paks/~mods`;
 export const LOGIC_MODS_RELPATH = `${INSTALL_DIR}/Content/Paks/LogicMods`;
-export const UE4SS_MODS_RELPATH = `${INSTALL_DIR}/Binaries/Win64/ue4ss/Mods`;
+export const UE4SS_MODS_RELPATH = `${INSTALL_DIR}/Binaries/${ARCH_WIN64}/ue4ss/Mods`;
 
 export const MOD_TYPE_PAK = 'subnautica2-pak';
 export const MOD_TYPE_LOGICMODS = 'subnautica2-logicmods';
