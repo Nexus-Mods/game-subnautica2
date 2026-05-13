@@ -16,7 +16,8 @@
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": ["node", "vitest/globals"]
   },
   "include": ["src/**/*", "test/**/*"]
 }

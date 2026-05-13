@@ -1,22 +1,17 @@
-/**
- * Minimal vortex-api mock for Jest. Only the surface our unit tests need.
- * Real types come from node_modules/vortex-api at compile time; this file
- * provides runtime stand-ins so `import { ... } from 'vortex-api'` resolves
- * without pulling in Vortex's electron/react runtime.
- */
+import { vi } from 'vitest';
 
-export const log = jest.fn();
+export const log = vi.fn();
 
 export const fs = {
-  ensureDirWritableAsync: jest.fn((_p: string) => Promise.resolve()),
-  ensureDirAsync: jest.fn((_p: string) => Promise.resolve()),
-  statAsync: jest.fn((_p: string) => Promise.resolve({ isDirectory: () => true })),
-  readdirAsync: jest.fn((_p: string) => Promise.resolve([] as string[])),
+  ensureDirWritableAsync: vi.fn((_p: string) => Promise.resolve()),
+  ensureDirAsync: vi.fn((_p: string) => Promise.resolve()),
+  statAsync: vi.fn((_p: string) => Promise.resolve({ isDirectory: () => true })),
+  readdirAsync: vi.fn((_p: string) => Promise.resolve([] as string[])),
 };
 
 export const util = {
   GameStoreHelper: {
-    findByAppId: jest.fn(),
+    findByAppId: vi.fn(),
   },
   getSafe: <T>(obj: unknown, path: readonly (string | number)[], fallback: T): T => {
     let cur: unknown = obj;
@@ -32,8 +27,8 @@ export const util = {
 };
 
 export const selectors = {
-  activeGameId: jest.fn(),
-  discoveryByGame: jest.fn(),
+  activeGameId: vi.fn(),
+  discoveryByGame: vi.fn(),
 };
 
 export const actions = {};

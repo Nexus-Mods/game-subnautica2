@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { resolveModPaths, prepareForModding } from '../src/game';
 import { fs } from 'vortex-api';
 
@@ -31,12 +32,12 @@ describe('resolveModPaths', () => {
 
 describe('prepareForModding', () => {
   test('ensures each resolved mod dir is writable', async () => {
-    const ensure = fs.ensureDirWritableAsync as jest.Mock;
+    const ensure = vi.mocked(fs.ensureDirWritableAsync);
     ensure.mockClear();
     const discovery = { path: '/games/Subnautica2', store: 'steam' as const };
     await prepareForModding(discovery);
     expect(ensure).toHaveBeenCalledTimes(3);
-    const calledWith = ensure.mock.calls.map((c: unknown[]) => c[0] as string);
+    const calledWith = ensure.mock.calls.map((c) => c[0]);
     expect(calledWith).toContain('/games/Subnautica2/Subnautica2/Content/Paks/~mods');
     expect(calledWith).toContain('/games/Subnautica2/Subnautica2/Content/Paks/LogicMods');
     expect(calledWith).toContain('/games/Subnautica2/Subnautica2/Binaries/Win64/ue4ss/Mods');
