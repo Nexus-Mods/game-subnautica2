@@ -34,6 +34,9 @@ export const UE4SS_SETTINGS_FILE = 'UE4SS-settings.ini';
 
 export const UE4SS_RELEASES_URL = 'https://github.com/UE4SS-RE/RE-UE4SS/releases';
 
+export const IGNORE_CONFLICTS = ['enabled.txt', 'mods.txt', 'UE4SS-settings.ini'];
+export const IGNORE_DEPLOY = ['mods.txt'];
+
 export interface ResolvedConstantsCheck {
   resolved: boolean;
   missing: string[];

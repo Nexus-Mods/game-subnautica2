@@ -54,4 +54,14 @@ describe('constants', () => {
       expect(v).not.toMatch(/\s/);
     }
   });
+
+  test('IGNORE_CONFLICTS suppresses UE4SS marker files from cross-mod conflict reports', () => {
+    expect(c.IGNORE_CONFLICTS).toContain('enabled.txt');
+    expect(c.IGNORE_CONFLICTS).toContain('mods.txt');
+    expect(c.IGNORE_CONFLICTS).toContain('UE4SS-settings.ini');
+  });
+
+  test('IGNORE_DEPLOY skips mods.txt since Vortex regenerates it on deploy', () => {
+    expect(c.IGNORE_DEPLOY).toContain('mods.txt');
+  });
 });

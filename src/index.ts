@@ -13,6 +13,8 @@ import {
   MOD_TYPE_LOGICMODS,
   MOD_TYPE_UE4SS,
   MOD_TYPE_UE4SS_INJECTOR,
+  IGNORE_CONFLICTS,
+  IGNORE_DEPLOY,
   checkConstantsResolved,
 } from './constants';
 import { prepareForModding, IDiscovery } from './game';
@@ -48,6 +50,8 @@ function init(context: types.IExtensionContext): boolean {
       nexusPageId: NEXUS_ID,
       supportsSymlinks: true,
       gameProjectFolder: INSTALL_DIR,
+      ignoreConflicts: IGNORE_CONFLICTS,
+      ignoreDeploy: IGNORE_DEPLOY,
     },
   });
 
