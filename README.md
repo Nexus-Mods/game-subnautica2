@@ -24,7 +24,7 @@ page](https://www.nexusmods.com/subnautica2), drag the archive into the
 
 ## Develop
 
-Requires **Node 20+** and **pnpm 11+**.
+Requires **Node 22+** and **pnpm 11+**.
 
 ```bash
 pnpm install
