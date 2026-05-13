@@ -1,4 +1,4 @@
-import { rootInstall, rootInstallerTest } from '../src/installers/rootInstaller';
+import { rootInstall, rootInstallerTest } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_ROOT = { type: 'setmodtype', value: 'subnautica2-root' };

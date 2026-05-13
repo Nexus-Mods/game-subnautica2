@@ -1,19 +1,17 @@
-import type { IInstruction } from './installers/types';
+export const PAK_EXTENSIONS = ['pak', 'ucas', 'utoc'] as const;
 
-export const PAK_MOD_EXTENSIONS = ['.pak', '.ucas', '.utoc'] as const;
-export const LUA_EXTENSIONS = ['.lua'] as const;
+export const UE4SS_INJECTOR_MARKERS = ['dwmapi.dll', 'xinput1_4.dll', 'ue4ss-settings.ini'] as const;
 
 export function dirToWordExp(seg: string): string {
   return `(^|/)${seg}(/|$)`;
 }
 
 export function extToWordExp(ext: string): string {
-  const e = ext.replace(/^\./, '');
-  return `[^/]*\\.${e}$`;
+  return `[^/]*\\.${ext.replace(/^\./, '')}$`;
 }
 
 export function getPakPatterns(): string[] {
-  return PAK_MOD_EXTENSIONS.map(extToWordExp);
+  return PAK_EXTENSIONS.map(extToWordExp);
 }
 
 export function getLogicModsPatterns(): string[] {
@@ -25,46 +23,13 @@ export function getUE4SSPatterns(): string[] {
 }
 
 export function getUE4SSInjectorPatterns(): string[] {
-  return [
-    '(^|/)dwmapi\\.dll$',
-    '(^|/)xinput1_4\\.dll$',
-    '(^|/)UE4SS-settings\\.ini$',
-  ];
-}
-
-export function getRootPatterns(): string[] {
-  return ['Subnautica2', 'Engine', 'Binaries'].map(dirToWordExp);
-}
-
-export function getContentFolderPatterns(): string[] {
-  return ['Content', 'Config'].map(dirToWordExp);
-}
-
-export function getPaksDirPattern(): string {
-  return dirToWordExp('paks');
-}
-
-function compile(patterns: readonly string[]): RegExp[] {
-  return patterns.map((p) => new RegExp(p, 'i'));
+  return UE4SS_INJECTOR_MARKERS.map((m) => `(^|/)${m.replace(/\./g, '\\.')}$`);
 }
 
 export function matchesAnyPattern(files: readonly string[], patterns: readonly string[]): boolean {
-  const regexes = compile(patterns);
+  const regexes = patterns.map((p) => new RegExp(p, 'i'));
   return files.some((f) => {
     const normal = f.replace(/\\/g, '/');
     return regexes.some((re) => re.test(normal));
   });
-}
-
-export function testStopPatterns(
-  instructions: readonly IInstruction[],
-  patterns: readonly string[],
-): boolean {
-  const regexes = compile(patterns);
-  for (const inst of instructions) {
-    if (inst.type !== 'copy') continue;
-    const normal = inst.destination.replace(/\\/g, '/');
-    if (regexes.some((re) => re.test(normal))) return true;
-  }
-  return false;
 }

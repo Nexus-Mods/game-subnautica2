@@ -5,45 +5,51 @@ import {
   EXEC,
   STEAMAPP_ID,
   EPIC_CATALOG_ITEM_ID,
+  EPIC_INSTALL_DIR,
   XBOX_PRODUCT_ID,
+  XBOX_PFN,
   NEXUS_ID,
   PAK_MODS_RELPATH,
   INSTALL_DIR,
-  MOD_TYPE_PAK,
-  MOD_TYPE_LOGICMODS,
-  MOD_TYPE_UE4SS,
-  MOD_TYPE_UE4SS_INJECTOR,
-  MOD_TYPE_ROOT,
-  MOD_TYPE_CONTENT_FOLDER,
-  MOD_TYPE_PAK_ALT,
   UE4SS_SETTINGS_FILE,
   IGNORE_CONFLICTS,
   IGNORE_DEPLOY,
-  checkConstantsResolved,
 } from './constants';
 import { prepareForModding, IDiscovery } from './game';
 import { registerModTypes } from './modTypes';
 import {
   isThisGameActive,
-  notifyIfUE4SSMissing,
   openInjectorFile,
   openModsFile,
   openNexusPage,
   regenerateModsFile,
 } from './util/ue4ssState';
-import { pakInstallerTest, pakInstall } from './installers/pakInstaller';
-import { logicModsInstallerTest, logicModsInstall } from './installers/logicModsInstaller';
-import { ue4ssInstallerTest, ue4ssInstall } from './installers/ue4ssInstaller';
-import { ue4ssInjectorTest, ue4ssInjectorInstall } from './installers/ue4ssInjectorInstaller';
-import { rootInstall, rootInstallerTest } from './installers/rootInstaller';
-import { contentFolderInstall, contentFolderInstallerTest } from './installers/contentFolderInstaller';
-import { pakAltInstall, pakAltInstallerTest } from './installers/pakAltInstaller';
+import { MOD_SPECS } from './installers';
+import { registerHealthChecks } from './healthChecks';
 
 const queryArgs = {
   steam: [{ id: STEAMAPP_ID, prefer: 0 }],
   epic: [{ id: EPIC_CATALOG_ITEM_ID }],
   xbox: [{ id: XBOX_PRODUCT_ID }],
 };
+
+const TOOLBAR_ACTIONS: readonly { priority: number; title: string; run: (api: types.IExtensionApi) => void }[] = [
+  { priority: 200, title: 'Open UE4SS Settings INI', run: (api) => openInjectorFile(api, UE4SS_SETTINGS_FILE) },
+  { priority: 201, title: 'Open UE4SS mods.txt', run: openModsFile },
+  { priority: 202, title: 'Open Nexus Page', run: () => openNexusPage() },
+];
+
+function warnIfConstantsUnresolved(): void {
+  const missing: string[] = [];
+  if (EPIC_INSTALL_DIR === null) missing.push('EPIC_INSTALL_DIR');
+  if (XBOX_PFN === null) missing.push('XBOX_PFN');
+  if (missing.length === 0) return;
+  log(
+    'warn',
+    `Subnautica 2: unresolved post-launch constants — ${missing.join(', ')}. ` +
+      'Update src/constants.ts after verifying values on an actual install.',
+  );
+}
 
 function init(context: types.IExtensionContext): boolean {
   context.registerGame({
@@ -71,56 +77,26 @@ function init(context: types.IExtensionContext): boolean {
 
   registerModTypes(context);
 
-  context.registerAction(
-    'mod-icons',
-    200,
-    'open-ext',
-    {},
-    'Open UE4SS Settings INI',
-    () => openInjectorFile(context.api, UE4SS_SETTINGS_FILE),
-    () => isThisGameActive(context.api),
-  );
-  context.registerAction(
-    'mod-icons',
-    201,
-    'open-ext',
-    {},
-    'Open UE4SS mods.txt',
-    () => openModsFile(context.api),
-    () => isThisGameActive(context.api),
-  );
-  context.registerAction(
-    'mod-icons',
-    202,
-    'open-ext',
-    {},
-    'Open Nexus Page',
-    () => openNexusPage(),
-    () => isThisGameActive(context.api),
-  );
+  for (const action of TOOLBAR_ACTIONS) {
+    context.registerAction(
+      'mod-icons',
+      action.priority,
+      'open-ext',
+      {},
+      action.title,
+      () => action.run(context.api),
+      () => isThisGameActive(context.api),
+    );
+  }
 
-  context.registerInstaller(MOD_TYPE_UE4SS_INJECTOR, 15, ue4ssInjectorTest as never, ue4ssInjectorInstall as never);
-  context.registerInstaller(MOD_TYPE_LOGICMODS, 20, logicModsInstallerTest as never, logicModsInstall as never);
-  context.registerInstaller(MOD_TYPE_UE4SS, 22, ue4ssInstallerTest as never, ue4ssInstall as never);
-  context.registerInstaller(MOD_TYPE_ROOT, 23, rootInstallerTest as never, rootInstall as never);
-  context.registerInstaller(MOD_TYPE_CONTENT_FOLDER, 25, contentFolderInstallerTest as never, contentFolderInstall as never);
-  context.registerInstaller(MOD_TYPE_PAK_ALT, 27, pakAltInstallerTest as never, pakAltInstall as never);
-  context.registerInstaller(MOD_TYPE_PAK, 30, pakInstallerTest as never, pakInstall as never);
+  for (const spec of MOD_SPECS) {
+    context.registerInstaller(spec.id, spec.priority, spec.test as never, spec.install as never);
+  }
+
+  registerHealthChecks(context);
 
   context.once(() => {
-    const check = checkConstantsResolved();
-    if (!check.resolved) {
-      log(
-        'warn',
-        `Subnautica 2: unresolved post-launch constants — ${check.missing.join(', ')}. ` +
-          'Update src/constants.ts after verifying values on an actual install.',
-      );
-    }
-
-    context.api.events.on('gamemode-activated', (gameId: string) => {
-      if (gameId !== GAME_ID) return;
-      void notifyIfUE4SSMissing(context.api);
-    });
+    warnIfConstantsUnresolved();
 
     context.api.onAsync('did-deploy', async () => {
       if (!isThisGameActive(context.api)) return;

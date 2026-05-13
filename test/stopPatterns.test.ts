@@ -6,9 +6,7 @@ import {
   getUE4SSInjectorPatterns,
   getUE4SSPatterns,
   matchesAnyPattern,
-  testStopPatterns,
 } from '../src/stopPatterns';
-import type { IInstruction } from '../src/installers/types';
 
 describe('dirToWordExp', () => {
   test('matches the directory segment case-insensitively', () => {
@@ -79,18 +77,3 @@ describe('matchesAnyPattern', () => {
   });
 });
 
-describe('testStopPatterns', () => {
-  test('checks copy-instruction destinations against the patterns', () => {
-    const instructions: IInstruction[] = [
-      { type: 'copy', source: 'a', destination: 'a/b/x.pak' },
-    ];
-    expect(testStopPatterns(instructions, getPakPatterns())).toBe(true);
-  });
-
-  test('ignores non-copy instructions', () => {
-    const instructions: IInstruction[] = [
-      { type: 'setmodtype', value: 'subnautica2-pak' },
-    ];
-    expect(testStopPatterns(instructions, getPakPatterns())).toBe(false);
-  });
-});

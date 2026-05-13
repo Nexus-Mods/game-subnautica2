@@ -1,4 +1,4 @@
-import { pakAltInstall, pakAltInstallerTest } from '../src/installers/pakAltInstaller';
+import { pakAltInstall, pakAltInstallerTest } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_PAKALT = { type: 'setmodtype', value: 'subnautica2-pakalt' };

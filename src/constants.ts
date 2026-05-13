@@ -31,9 +31,6 @@ export const MOD_TYPE_ROOT = 'subnautica2-root';
 export const MOD_TYPE_CONTENT_FOLDER = 'subnautica2-contentfolder';
 export const MOD_TYPE_PAK_ALT = 'subnautica2-pakalt';
 
-export const PAK_TOP_LEVEL_DIRS = [INSTALL_DIR, 'Engine', 'Binaries'];
-export const CONTENT_TOP_LEVEL_DIRS = ['Content', 'Config'];
-
 export const UE4SS_DWMAPI_FILE = 'dwmapi.dll';
 export const UE4SS_XINPUT_FILE = 'xinput1_4.dll';
 export const UE4SS_SETTINGS_FILE = 'UE4SS-settings.ini';
@@ -42,15 +39,3 @@ export const UE4SS_RELEASES_URL = 'https://github.com/UE4SS-RE/RE-UE4SS/releases
 
 export const IGNORE_CONFLICTS = ['enabled.txt', 'mods.txt', 'UE4SS-settings.ini'];
 export const IGNORE_DEPLOY = ['mods.txt'];
-
-export interface ResolvedConstantsCheck {
-  resolved: boolean;
-  missing: string[];
-}
-
-export function checkConstantsResolved(): ResolvedConstantsCheck {
-  const missing: string[] = [];
-  if (EPIC_INSTALL_DIR === null) missing.push('EPIC_INSTALL_DIR');
-  if (XBOX_PFN === null) missing.push('XBOX_PFN');
-  return { resolved: missing.length === 0, missing };
-}

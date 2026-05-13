@@ -1,4 +1,4 @@
-import { ue4ssInstallerTest, ue4ssInstall } from '../src/installers/ue4ssInstaller';
+import { ue4ssInstallerTest, ue4ssInstall } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_UE4SS = { type: 'setmodtype', value: 'subnautica2-ue4ss' };

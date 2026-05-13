@@ -3,7 +3,7 @@ import {
   GAME_ID,
   NEXUS_ID,
   UE4SS_DWMAPI_FILE,
-  UE4SS_RELEASES_URL,
+  UE4SS_SETTINGS_FILE,
   UE4SS_XINPUT_FILE,
 } from '../constants';
 import { resolveGamePath, ue4ssInjectorPath, ue4ssModsPath } from '../game';
@@ -13,40 +13,49 @@ interface VortexDiscovery {
   store?: string;
 }
 
-const NOTIF_ID = 'subnautica2-ue4ss-missing';
-
-type DiscoveryByGameFn = (state: unknown, gameId: string) => VortexDiscovery | undefined;
-type ActiveGameIdFn = (state: unknown) => string | undefined;
+type RelPath = string | ((isXbox: boolean) => string);
 
 function getDiscovery(api: types.IExtensionApi, gameId: string): VortexDiscovery | undefined {
-  const lookup = selectors.discoveryByGame as unknown as DiscoveryByGameFn;
-  return lookup(api.getState(), gameId);
+  return (
+    selectors.discoveryByGame as unknown as (s: unknown, g: string) => VortexDiscovery | undefined
+  )(api.getState(), gameId);
 }
 
 function getActiveGameId(api: types.IExtensionApi): string | undefined {
-  const lookup = selectors.activeGameId as unknown as ActiveGameIdFn;
-  return lookup(api.getState());
+  return (selectors.activeGameId as unknown as (s: unknown) => string | undefined)(api.getState());
 }
 
 function opn(url: string): void {
   void (util as unknown as { opn: (u: string) => Promise<void> }).opn(url);
 }
 
-export function ue4ssProxyAbsolutePath(discovery: VortexDiscovery): string | undefined {
-  if (!discovery.path) return undefined;
-  const isXbox = discovery.store === 'xbox';
-  const proxy = isXbox ? UE4SS_XINPUT_FILE : UE4SS_DWMAPI_FILE;
-  return resolveGamePath(discovery.path, `${ue4ssInjectorPath(isXbox)}/${proxy}`, isXbox);
+function resolveFor(d: VortexDiscovery | undefined, rel: RelPath): string | undefined {
+  if (!d?.path) return undefined;
+  const isXbox = d.store === 'xbox';
+  const resolved = typeof rel === 'function' ? rel(isXbox) : rel;
+  return resolveGamePath(d.path, resolved, isXbox);
 }
 
-export async function isUE4SSInstalled(
-  api: types.IExtensionApi,
-  gameId: string = GAME_ID,
-): Promise<boolean> {
-  const discovery = getDiscovery(api, gameId);
-  if (!discovery) return false;
-  const absolute = ue4ssProxyAbsolutePath(discovery);
-  if (absolute === undefined) return false;
+function gameAbsPath(api: types.IExtensionApi, rel: RelPath): string | undefined {
+  return resolveFor(getDiscovery(api, GAME_ID), rel);
+}
+
+const proxyFile = (isXbox: boolean): string => (isXbox ? UE4SS_XINPUT_FILE : UE4SS_DWMAPI_FILE);
+
+export function ue4ssProxyAbsolutePath(discovery: VortexDiscovery): string | undefined {
+  return resolveFor(discovery, (isXbox) => `${ue4ssInjectorPath(isXbox)}/${proxyFile(isXbox)}`);
+}
+
+export function ue4ssSettingsAbsolutePath(api: types.IExtensionApi): string | undefined {
+  return gameAbsPath(api, (isXbox) => `${ue4ssInjectorPath(isXbox)}/${UE4SS_SETTINGS_FILE}`);
+}
+
+export function ue4ssModsTxtAbsolutePath(api: types.IExtensionApi): string | undefined {
+  return gameAbsPath(api, (isXbox) => `${ue4ssModsPath(isXbox)}/mods.txt`);
+}
+
+async function fileExists(absolute: string | undefined): Promise<boolean> {
+  if (!absolute) return false;
   try {
     await fs.statAsync(absolute);
     return true;
@@ -55,52 +64,30 @@ export async function isUE4SSInstalled(
   }
 }
 
-export async function notifyIfUE4SSMissing(
+export async function isUE4SSInstalled(
   api: types.IExtensionApi,
   gameId: string = GAME_ID,
-): Promise<void> {
-  if (await isUE4SSInstalled(api, gameId)) return;
-  api.sendNotification?.({
-    id: NOTIF_ID,
-    type: 'warning',
-    title: 'UE4SS not detected',
-    message:
-      'Install UE4SS to use Lua scripts or Blueprint mods for Subnautica 2. ' +
-      'Drop the UE4SS archive into the Extensions drop zone and Vortex will route it for you.',
-    actions: [
-      {
-        title: 'Get UE4SS',
-        action: (): void => opn(UE4SS_RELEASES_URL),
-      },
-    ],
-  });
+): Promise<boolean> {
+  const discovery = getDiscovery(api, gameId);
+  return fileExists(discovery && ue4ssProxyAbsolutePath(discovery));
 }
 
 export function isThisGameActive(api: types.IExtensionApi): boolean {
   return getActiveGameId(api) === GAME_ID;
 }
 
-function injectorFilePath(api: types.IExtensionApi, filename: string): string | undefined {
-  const discovery = getDiscovery(api, GAME_ID);
-  if (!discovery?.path) return undefined;
-  const isXbox = discovery.store === 'xbox';
-  return resolveGamePath(discovery.path, `${ue4ssInjectorPath(isXbox)}/${filename}`, isXbox);
-}
-
-function modsFilePath(api: types.IExtensionApi): string | undefined {
-  const discovery = getDiscovery(api, GAME_ID);
-  if (!discovery?.path) return undefined;
-  const isXbox = discovery.store === 'xbox';
-  return resolveGamePath(discovery.path, `${ue4ssModsPath(isXbox)}/mods.txt`, isXbox);
-}
-
 export function openInjectorFile(api: types.IExtensionApi, filename: string): void {
-  const target = injectorFilePath(api, filename);
+  const target = gameAbsPath(api, (isXbox) => `${ue4ssInjectorPath(isXbox)}/${filename}`);
+  if (target !== undefined) opn(target);
+}
+
+export function openInjectorFolder(api: types.IExtensionApi): void {
+  const target = gameAbsPath(api, ue4ssInjectorPath);
   if (target !== undefined) opn(target);
 }
 
 export function openModsFile(api: types.IExtensionApi): void {
-  const target = modsFilePath(api);
+  const target = gameAbsPath(api, (isXbox) => `${ue4ssModsPath(isXbox)}/mods.txt`);
   if (target !== undefined) opn(target);
 }
 
@@ -108,31 +95,65 @@ export function openNexusPage(): void {
   opn(`https://www.nexusmods.com/${NEXUS_ID}`);
 }
 
-async function listModDirs(modsDir: string): Promise<string[]> {
+export function openUrl(url: string): void {
+  opn(url);
+}
+
+export async function isUE4SSSettingsPresent(api: types.IExtensionApi): Promise<boolean> {
+  return fileExists(ue4ssSettingsAbsolutePath(api));
+}
+
+export async function listModDirs(modsDir: string): Promise<string[]> {
   let entries: string[];
   try {
     entries = await fs.readdirAsync(modsDir);
   } catch {
     return [];
   }
-  const dirs: string[] = [];
-  for (const entry of entries) {
-    if (entry === 'mods.txt' || entry === 'mods.json') continue;
-    try {
-      const stat = (await fs.statAsync(`${modsDir}/${entry}`)) as { isDirectory: () => boolean };
-      if (stat.isDirectory()) dirs.push(entry);
-    } catch {
-      // ignore unreachable entries
-    }
+  const candidates = entries.filter((e) => e !== 'mods.txt' && e !== 'mods.json');
+  const checked = await Promise.all(
+    candidates.map(async (entry) => {
+      try {
+        const stat = (await fs.statAsync(`${modsDir}/${entry}`)) as { isDirectory: () => boolean };
+        return stat.isDirectory() ? entry : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+  return checked.filter((e): e is string => e !== null);
+}
+
+function parseModsTxtNames(content: string): string[] {
+  return content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith(';') && !line.startsWith('#'))
+    .map((line) => line.split(':')[0]!.trim())
+    .filter((name) => name.length > 0);
+}
+
+export async function modsTxtMatchesDeployedDirs(api: types.IExtensionApi): Promise<boolean> {
+  const modsDir = gameAbsPath(api, ue4ssModsPath);
+  const txtPath = ue4ssModsTxtAbsolutePath(api);
+  if (modsDir === undefined || txtPath === undefined) return true;
+  const dirs = await listModDirs(modsDir);
+  let content: string;
+  try {
+    content = String(await fs.readFileAsync(txtPath, { encoding: 'utf8' } as never));
+  } catch {
+    return dirs.length === 0;
   }
-  return dirs;
+  const listed = parseModsTxtNames(content);
+  if (listed.length !== dirs.length) return false;
+  const a = [...listed].sort();
+  const b = [...dirs].sort();
+  return a.every((name, i) => name === b[i]);
 }
 
 export async function regenerateModsFile(api: types.IExtensionApi): Promise<void> {
-  const discovery = getDiscovery(api, GAME_ID);
-  if (!discovery?.path) return;
-  const isXbox = discovery.store === 'xbox';
-  const modsDir = resolveGamePath(discovery.path, ue4ssModsPath(isXbox), isXbox);
+  const modsDir = gameAbsPath(api, ue4ssModsPath);
+  if (modsDir === undefined) return;
   const dirs = await listModDirs(modsDir);
   const content = dirs.map((d) => `${d} : 1`).join('\n') + (dirs.length > 0 ? '\n' : '');
   await fs.writeFileAsync(`${modsDir}/mods.txt`, content);

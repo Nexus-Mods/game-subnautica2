@@ -3,7 +3,6 @@ import { fs, selectors, types, util } from 'vortex-api';
 import {
   isThisGameActive,
   isUE4SSInstalled,
-  notifyIfUE4SSMissing,
   openInjectorFile,
   openModsFile,
   openNexusPage,
@@ -77,35 +76,6 @@ describe('isUE4SSInstalled', () => {
   test('returns false when the game is not discovered', async () => {
     mockedDiscovery.mockReturnValue(undefined);
     expect(await isUE4SSInstalled(asExtensionApi(makeApi()))).toBe(false);
-  });
-});
-
-describe('notifyIfUE4SSMissing', () => {
-  test('does not notify when UE4SS is installed', async () => {
-    mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
-    mockedStat.mockResolvedValueOnce({ isDirectory: () => false });
-    const api = makeApi();
-    await notifyIfUE4SSMissing(asExtensionApi(api));
-    expect(api.sendNotification).not.toHaveBeenCalled();
-  });
-
-  test('sends a warning notification with a Get UE4SS action when missing', async () => {
-    mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
-    mockedStat.mockRejectedValueOnce(new Error('ENOENT'));
-    const api = makeApi();
-    await notifyIfUE4SSMissing(asExtensionApi(api));
-    expect(api.sendNotification).toHaveBeenCalledTimes(1);
-    const notif = api.sendNotification.mock.calls[0]![0] as {
-      type: string;
-      title: string;
-      actions: { title: string; action: () => void }[];
-    };
-    expect(notif.type).toBe('warning');
-    expect(notif.title).toMatch(/UE4SS/);
-    expect(notif.actions).toHaveLength(1);
-    expect(notif.actions[0]!.title).toBe('Get UE4SS');
-    notif.actions[0]!.action();
-    expect(mockedOpn).toHaveBeenCalledWith('https://github.com/UE4SS-RE/RE-UE4SS/releases');
   });
 });
 

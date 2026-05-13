@@ -7,7 +7,7 @@ import {
   MOD_TYPE_UE4SS,
   MOD_TYPE_UE4SS_INJECTOR,
 } from '../src/constants';
-import type { IInstruction } from '../src/installers/types';
+import type { IInstruction } from '../src/installers';
 
 describe('isTypeMatch', () => {
   test('returns true when a setmodtype instruction has the queried type', () => {

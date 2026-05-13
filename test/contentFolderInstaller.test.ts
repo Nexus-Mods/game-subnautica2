@@ -1,4 +1,4 @@
-import { contentFolderInstall, contentFolderInstallerTest } from '../src/installers/contentFolderInstaller';
+import { contentFolderInstall, contentFolderInstallerTest } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_CONTENT = { type: 'setmodtype', value: 'subnautica2-contentfolder' };

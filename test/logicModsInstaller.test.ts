@@ -1,4 +1,4 @@
-import { logicModsInstallerTest, logicModsInstall } from '../src/installers/logicModsInstaller';
+import { logicModsInstallerTest, logicModsInstall } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_LOGICMODS = { type: 'setmodtype', value: 'subnautica2-logicmods' };

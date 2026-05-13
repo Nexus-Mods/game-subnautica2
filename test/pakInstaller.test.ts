@@ -1,4 +1,4 @@
-import { pakInstallerTest, pakInstall } from '../src/installers/pakInstaller';
+import { pakInstallerTest, pakInstall } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_PAK = { type: 'setmodtype', value: 'subnautica2-pak' };

@@ -1,4 +1,4 @@
-import { ue4ssInjectorTest, ue4ssInjectorInstall } from '../src/installers/ue4ssInjectorInstaller';
+import { ue4ssInjectorTest, ue4ssInjectorInstall } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_INJECTOR = { type: 'setmodtype', value: 'subnautica2-ue4ss-injector' };
