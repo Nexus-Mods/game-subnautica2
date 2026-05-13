@@ -27,6 +27,12 @@ export const MOD_TYPE_PAK = 'subnautica2-pak';
 export const MOD_TYPE_LOGICMODS = 'subnautica2-logicmods';
 export const MOD_TYPE_UE4SS = 'subnautica2-ue4ss';
 export const MOD_TYPE_UE4SS_INJECTOR = 'subnautica2-ue4ss-injector';
+export const MOD_TYPE_ROOT = 'subnautica2-root';
+export const MOD_TYPE_CONTENT_FOLDER = 'subnautica2-contentfolder';
+export const MOD_TYPE_PAK_ALT = 'subnautica2-pakalt';
+
+export const PAK_TOP_LEVEL_DIRS = [INSTALL_DIR, 'Engine', 'Binaries'];
+export const CONTENT_TOP_LEVEL_DIRS = ['Content', 'Config'];
 
 export const UE4SS_DWMAPI_FILE = 'dwmapi.dll';
 export const UE4SS_XINPUT_FILE = 'xinput1_4.dll';

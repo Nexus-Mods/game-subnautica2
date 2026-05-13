@@ -34,8 +34,10 @@ export function ue4ssModsPath(isXbox: boolean): string {
 export function resolveGamePath(gamePath: string, rel: string, isXbox: boolean): string {
   const prefix = `${INSTALL_DIR}/`;
   const tail = isXbox && rel.startsWith(prefix) ? rel.slice(prefix.length) : rel;
+  const joined = joinRel(tail);
+  if (joined === '') return gamePath;
   const sep = gamePath.endsWith('/') || gamePath.endsWith('\\') ? '' : '/';
-  return `${gamePath}${sep}${joinRel(tail)}`;
+  return `${gamePath}${sep}${joined}`;
 }
 
 export function resolveModPaths(discovery: IDiscovery): IResolvedModPaths {

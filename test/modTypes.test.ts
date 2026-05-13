@@ -1,5 +1,12 @@
 import { isTypeMatch } from '../src/modTypes';
-import { MOD_TYPE_LOGICMODS, MOD_TYPE_UE4SS, MOD_TYPE_UE4SS_INJECTOR } from '../src/constants';
+import {
+  MOD_TYPE_CONTENT_FOLDER,
+  MOD_TYPE_LOGICMODS,
+  MOD_TYPE_PAK_ALT,
+  MOD_TYPE_ROOT,
+  MOD_TYPE_UE4SS,
+  MOD_TYPE_UE4SS_INJECTOR,
+} from '../src/constants';
 import type { IInstruction } from '../src/installers/types';
 
 describe('isTypeMatch', () => {
@@ -31,5 +38,13 @@ describe('isTypeMatch', () => {
       { type: 'copy', source: 'dwmapi.dll', destination: 'dwmapi.dll' },
     ];
     expect(isTypeMatch(MOD_TYPE_UE4SS_INJECTOR, instructions)).toBe(true);
+  });
+
+  test.each([
+    [MOD_TYPE_ROOT, 'subnautica2-root'],
+    [MOD_TYPE_CONTENT_FOLDER, 'subnautica2-contentfolder'],
+    [MOD_TYPE_PAK_ALT, 'subnautica2-pakalt'],
+  ])('matches the %s setmodtype value', (typeId, _expected) => {
+    expect(isTypeMatch(typeId, [{ type: 'setmodtype', value: typeId }])).toBe(true);
   });
 });

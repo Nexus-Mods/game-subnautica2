@@ -32,6 +32,18 @@ export function getUE4SSInjectorPatterns(): string[] {
   ];
 }
 
+export function getRootPatterns(): string[] {
+  return ['Subnautica2', 'Engine', 'Binaries'].map(dirToWordExp);
+}
+
+export function getContentFolderPatterns(): string[] {
+  return ['Content', 'Config'].map(dirToWordExp);
+}
+
+export function getPaksDirPattern(): string {
+  return dirToWordExp('paks');
+}
+
 function compile(patterns: readonly string[]): RegExp[] {
   return patterns.map((p) => new RegExp(p, 'i'));
 }

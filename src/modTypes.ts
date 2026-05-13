@@ -2,8 +2,12 @@ import Bluebird from 'bluebird';
 import { types } from 'vortex-api';
 import {
   GAME_ID,
+  INSTALL_DIR,
   LOGIC_MODS_RELPATH,
+  MOD_TYPE_CONTENT_FOLDER,
   MOD_TYPE_LOGICMODS,
+  MOD_TYPE_PAK_ALT,
+  MOD_TYPE_ROOT,
   MOD_TYPE_UE4SS,
   MOD_TYPE_UE4SS_INJECTOR,
 } from './constants';
@@ -29,14 +33,18 @@ export function isTypeMatch(typeId: string, instructions: readonly IInstruction[
   return instructions.some((i) => i.type === 'setmodtype' && i.value === typeId);
 }
 
+function testFor(typeId: string) {
+  return ((instructions: readonly IInstruction[]) =>
+    Bluebird.resolve(isTypeMatch(typeId, instructions))) as never;
+}
+
 export function registerModTypes(context: types.IExtensionContext): void {
   context.registerModType(
     MOD_TYPE_UE4SS_INJECTOR,
     15,
     isThisGame,
     (game) => modPathFor(game, ue4ssInjectorPath),
-    ((instructions: readonly IInstruction[]) =>
-      Bluebird.resolve(isTypeMatch(MOD_TYPE_UE4SS_INJECTOR, instructions))) as never,
+    testFor(MOD_TYPE_UE4SS_INJECTOR),
     { name: 'UE4SS Injector', mergeMods: true },
   );
 
@@ -45,8 +53,7 @@ export function registerModTypes(context: types.IExtensionContext): void {
     20,
     isThisGame,
     (game) => modPathFor(game, LOGIC_MODS_RELPATH),
-    ((instructions: readonly IInstruction[]) =>
-      Bluebird.resolve(isTypeMatch(MOD_TYPE_LOGICMODS, instructions))) as never,
+    testFor(MOD_TYPE_LOGICMODS),
     { name: 'LogicMods (Blueprint paks)', mergeMods: true },
   );
 
@@ -55,8 +62,34 @@ export function registerModTypes(context: types.IExtensionContext): void {
     22,
     isThisGame,
     (game) => modPathFor(game, ue4ssModsPath),
-    ((instructions: readonly IInstruction[]) =>
-      Bluebird.resolve(isTypeMatch(MOD_TYPE_UE4SS, instructions))) as never,
+    testFor(MOD_TYPE_UE4SS),
     { name: 'UE4SS (Lua scripts)', mergeMods: true },
+  );
+
+  context.registerModType(
+    MOD_TYPE_ROOT,
+    23,
+    isThisGame,
+    (game) => modPathFor(game, ''),
+    testFor(MOD_TYPE_ROOT),
+    { name: 'Root (game folder layout)', mergeMods: true },
+  );
+
+  context.registerModType(
+    MOD_TYPE_CONTENT_FOLDER,
+    25,
+    isThisGame,
+    (game) => modPathFor(game, INSTALL_DIR),
+    testFor(MOD_TYPE_CONTENT_FOLDER),
+    { name: 'Content folder', mergeMods: true },
+  );
+
+  context.registerModType(
+    MOD_TYPE_PAK_ALT,
+    27,
+    isThisGame,
+    (game) => modPathFor(game, `${INSTALL_DIR}/Content/Paks`),
+    testFor(MOD_TYPE_PAK_ALT),
+    { name: 'Paks (no ~mods)', mergeMods: true },
   );
 }
