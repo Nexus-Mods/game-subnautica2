@@ -1,0 +1,52 @@
+{
+  "name": "game-subnautica2",
+  "version": "0.1.0",
+  "description": "Adds support for Subnautica 2 (UE5 / UE4SS). Supports pak mods, LogicMods, and UE4SS Lua mods.",
+  "author": "tbaldridge",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "packageManager": "pnpm@11.0.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "config": {
+    "game": "Subnautica 2"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "core-js"
+    ]
+  },
+  "scripts": {
+    "build": "cross-env TARGET_ENV=production webpack",
+    "watch": "webpack --watch",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts\" \"test/**/*.ts\"",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "gen-info": "node node_modules/vortex-api/bin/extractInfo.js",
+    "package": "pnpm run build && pnpm run gen-info && node scripts/package.mjs",
+    "clean": "rimraf dist out"
+  },
+  "devDependencies": {
+    "@types/bluebird": "3.5.20",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
+    "bluebird": "3.7.2",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.2",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "vortex-api": "github:Nexus-Mods/vortex-api",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

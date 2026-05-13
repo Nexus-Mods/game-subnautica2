@@ -1,0 +1,9 @@
+node_modules/
+dist/
+out/
+info.json
+*.7z
+*.log
+.DS_Store
+coverage/
+.eslintcache
