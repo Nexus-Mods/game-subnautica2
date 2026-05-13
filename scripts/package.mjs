@@ -16,7 +16,7 @@ if (!version) {
 
 const outDir = join(root, 'out');
 const stagingDir = join(outDir, 'stage');
-const archiveName = `subnautica2-vortex-v${version}.7z`;
+const archiveName = `subnautica2-vortex-v${version}.zip`;
 const archivePath = join(outDir, archiveName);
 
 const required = [
@@ -41,9 +41,9 @@ for (const [src, dst] of required) {
 if (existsSync(archivePath)) rmSync(archivePath, { force: true });
 
 try {
-  execFileSync('7z', ['a', '-t7z', archivePath, '*'], { cwd: stagingDir, stdio: 'inherit' });
+  execFileSync('zip', ['-r', archivePath, '.'], { cwd: stagingDir, stdio: 'inherit' });
 } catch (err) {
-  console.error('Failed to run 7z. Install p7zip-full (Linux) or 7-Zip (Windows) and retry.');
+  console.error('Failed to run zip. It ships by default on Linux/macOS; on Windows use Git Bash (which bundles it) or install Info-ZIP.');
   console.error(err.message);
   process.exit(1);
 }

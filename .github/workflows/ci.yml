@@ -43,6 +43,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
@@ -55,11 +58,32 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - run: sudo apt-get update && sudo apt-get install -y p7zip-full
       - run: pnpm install --frozen-lockfile
+
+      - name: Verify tag matches package.json version
+        id: meta
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag v$TAG_VERSION does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+          echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+          echo "zip_name=subnautica2-vortex-v${PKG_VERSION}.zip" >> "$GITHUB_OUTPUT"
+
       - run: pnpm run package
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: out/*.7z
+          files: out/*.zip
           generate_release_notes: true
+
+      - name: Publish to Nexus Mods
+        uses: Nexus-Mods/upload-action@main
+        with:
+          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+          file_group_id: ${{ vars.NEXUSMODS_FILE_GROUP_ID }}
+          display_name: Subnautica 2 Support for Vortex
+          filename: out/${{ steps.meta.outputs.zip_name }}
+          version: ${{ steps.meta.outputs.version }}

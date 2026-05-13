@@ -14,11 +14,13 @@ Auto-discovers Subnautica 2 on **Steam** (app `1962700`), **Epic Games Store**
 
 ## Install (end users)
 
-1. Download the latest `subnautica2-vortex-vX.Y.Z.7z` from
-   [Releases](../../releases).
-2. Drag the archive into the **Extensions** drop zone in Vortex
-   (Settings → Extensions).
-3. Restart Vortex. The game tile appears under "Games".
+Easiest: open Vortex's Extensions tab, find **Subnautica 2 Support** in the
+list, click Install. Vortex pulls the latest release from the Nexus Mods page.
+
+Manual: download the latest `subnautica2-vortex-vX.Y.Z.zip` from
+[Releases](../../releases) or from the [Nexus Mods
+page](https://www.nexusmods.com/subnautica2), drag the archive into the
+**Extensions** drop zone in Vortex (Settings → Extensions), and restart.
 
 ## Develop
 
@@ -42,13 +44,51 @@ pnpm run gen-info  # produces dist/info.json from package.json
 
 ### Release
 
-Tag a commit `vX.Y.Z` and push. GitHub Actions runs the `release` job which
-runs `pnpm run package` to produce `out/subnautica2-vortex-vX.Y.Z.7z` and
-attaches it to a GitHub Release. Locally:
+The `release` job in `.github/workflows/ci.yml` runs on every `v*` tag. It
+builds, packages `out/subnautica2-vortex-vX.Y.Z.zip`, attaches it to a GitHub
+Release, **and** uploads the same artifact to the Nexus Mods page via the
+official `Nexus-Mods/upload-action`.
+
+#### One-time setup
+
+Before the first tagged release will succeed:
+
+1. Create the Subnautica 2 mod page at
+   <https://www.nexusmods.com/subnautica2/mods>. The first submission needs
+   moderator approval, which can take a few days.
+2. On the new mod page's **Files** tab, click **Manage files** → **Add file**
+   to create an initial file entry. Note the numeric `file_group_id` from the
+   file entry's edit URL.
+3. Generate a Personal API Key at
+   <https://www.nexusmods.com/users/myaccount?tab=api+access> (not an OAuth
+   client).
+4. In the GitHub repo, under **Settings → Secrets and variables → Actions**:
+   - Add a **Secret** `NEXUSMODS_API_KEY` set to the key from step 3.
+   - Add a **Variable** `NEXUSMODS_FILE_GROUP_ID` set to the ID from step 2.
+
+#### Per-release flow
+
+1. Bump `version` in `package.json` to `X.Y.Z`.
+2. Commit, tag, push:
+
+   ```bash
+   git commit -am "Bump version to X.Y.Z"
+   git tag vX.Y.Z
+   git push origin main vX.Y.Z
+   ```
+
+3. The `release` job verifies the tag matches `package.json`, packages the
+   `.zip`, creates a GitHub Release, and uploads the same `.zip` to the
+   `NEXUSMODS_FILE_GROUP_ID` group on Nexus.
+
+#### Local packaging
 
 ```bash
-pnpm run package   # writes out/subnautica2-vortex-v$VERSION.7z
+pnpm run package   # writes out/subnautica2-vortex-v$VERSION.zip
 ```
+
+Requires `zip` on PATH (preinstalled on Linux/macOS; on Windows use Git Bash
+or install Info-ZIP).
 
 ## Architecture
 
