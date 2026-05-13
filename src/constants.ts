@@ -26,6 +26,11 @@ export const UE4SS_MODS_RELPATH = `${INSTALL_DIR}/Binaries/${ARCH_WIN64}/ue4ss/M
 export const MOD_TYPE_PAK = 'subnautica2-pak';
 export const MOD_TYPE_LOGICMODS = 'subnautica2-logicmods';
 export const MOD_TYPE_UE4SS = 'subnautica2-ue4ss';
+export const MOD_TYPE_UE4SS_INJECTOR = 'subnautica2-ue4ss-injector';
+
+export const UE4SS_DWMAPI_FILE = 'dwmapi.dll';
+export const UE4SS_XINPUT_FILE = 'xinput1_4.dll';
+export const UE4SS_SETTINGS_FILE = 'UE4SS-settings.ini';
 
 export interface ResolvedConstantsCheck {
   resolved: boolean;

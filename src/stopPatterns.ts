@@ -24,6 +24,14 @@ export function getUE4SSPatterns(): string[] {
   return [dirToWordExp('scripts'), extToWordExp('.lua'), 'enabled\\.txt$'];
 }
 
+export function getUE4SSInjectorPatterns(): string[] {
+  return [
+    '(^|/)dwmapi\\.dll$',
+    '(^|/)xinput1_4\\.dll$',
+    '(^|/)UE4SS-settings\\.ini$',
+  ];
+}
+
 function compile(patterns: readonly string[]): RegExp[] {
   return patterns.map((p) => new RegExp(p, 'i'));
 }

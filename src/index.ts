@@ -12,6 +12,7 @@ import {
   MOD_TYPE_PAK,
   MOD_TYPE_LOGICMODS,
   MOD_TYPE_UE4SS,
+  MOD_TYPE_UE4SS_INJECTOR,
   checkConstantsResolved,
 } from './constants';
 import { prepareForModding, IDiscovery } from './game';
@@ -19,6 +20,7 @@ import { registerModTypes } from './modTypes';
 import { pakInstallerTest, pakInstall } from './installers/pakInstaller';
 import { logicModsInstallerTest, logicModsInstall } from './installers/logicModsInstaller';
 import { ue4ssInstallerTest, ue4ssInstall } from './installers/ue4ssInstaller';
+import { ue4ssInjectorTest, ue4ssInjectorInstall } from './installers/ue4ssInjectorInstaller';
 
 const queryArgs = {
   steam: [{ id: STEAMAPP_ID, prefer: 0 }],
@@ -50,6 +52,7 @@ function init(context: types.IExtensionContext): boolean {
 
   registerModTypes(context);
 
+  context.registerInstaller(MOD_TYPE_UE4SS_INJECTOR, 15, ue4ssInjectorTest as never, ue4ssInjectorInstall as never);
   context.registerInstaller(MOD_TYPE_LOGICMODS, 20, logicModsInstallerTest as never, logicModsInstall as never);
   context.registerInstaller(MOD_TYPE_UE4SS, 22, ue4ssInstallerTest as never, ue4ssInstall as never);
   context.registerInstaller(MOD_TYPE_PAK, 25, pakInstallerTest as never, pakInstall as never);

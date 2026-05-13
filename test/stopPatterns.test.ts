@@ -3,6 +3,7 @@ import {
   extToWordExp,
   getLogicModsPatterns,
   getPakPatterns,
+  getUE4SSInjectorPatterns,
   getUE4SSPatterns,
   matchesAnyPattern,
   testStopPatterns,
@@ -54,6 +55,13 @@ describe('pattern getters', () => {
     expect(matchesAnyPattern(['MyMod/script.lua'], getUE4SSPatterns())).toBe(true);
     expect(matchesAnyPattern(['MyMod/enabled.txt'], getUE4SSPatterns())).toBe(true);
     expect(matchesAnyPattern(['mods/MyMod/Scripts/main.lua'], getUE4SSPatterns())).toBe(true);
+  });
+
+  test('getUE4SSInjectorPatterns matches the proxy DLLs and settings ini', () => {
+    expect(matchesAnyPattern(['dwmapi.dll'], getUE4SSInjectorPatterns())).toBe(true);
+    expect(matchesAnyPattern(['ue4ss/xinput1_4.dll'], getUE4SSInjectorPatterns())).toBe(true);
+    expect(matchesAnyPattern(['ue4ss/UE4SS-settings.ini'], getUE4SSInjectorPatterns())).toBe(true);
+    expect(matchesAnyPattern(['mod_P.pak'], getUE4SSInjectorPatterns())).toBe(false);
   });
 });
 
