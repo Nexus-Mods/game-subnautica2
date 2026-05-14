@@ -1,6 +1,6 @@
 {
   "name": "game-subnautica2",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Adds support for Subnautica 2 (UE5 / UE4SS). Supports pak mods, LogicMods, and UE4SS Lua mods.",
   "author": "tbaldridge",
   "license": "GPL-3.0-or-later",
