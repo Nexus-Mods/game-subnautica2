@@ -78,8 +78,8 @@ jobs:
       - name: Publish to Nexus Mods
         uses: Nexus-Mods/upload-action@main
         with:
-          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
-          file_group_id: ${{ vars.NEXUSMODS_FILE_GROUP_ID }}
+          api_key: ${{ secrets.NEXUS_API_KEY }}
+          file_group_id: '7418978'
           display_name: Subnautica 2 Support for Vortex
           filename: out/${{ steps.meta.outputs.zip_name }}
           version: ${{ steps.meta.outputs.version }}
