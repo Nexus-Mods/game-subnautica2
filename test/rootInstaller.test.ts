@@ -1,31 +1,31 @@
-import { rootInstall, rootInstallerTest } from '../src/installers';
+import { rootInstall, rootTest } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_ROOT = { type: 'setmodtype', value: 'subnautica2-root' };
 
-describe('rootInstallerTest', () => {
+describe('rootTest', () => {
   test('accepts an archive with Subnautica2/ as top-level segment', async () => {
-    const result = await rootInstallerTest(['Subnautica2/Content/Paks/mod.pak'], GAME_ID);
+    const result = await rootTest(['Subnautica2/Content/Paks/mod.pak'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 
   test('accepts an archive with Engine/ as top-level segment', async () => {
-    const result = await rootInstallerTest(['Engine/Config/BaseEngine.ini'], GAME_ID);
+    const result = await rootTest(['Engine/Config/BaseEngine.ini'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 
   test('accepts an archive with Binaries/ at top level', async () => {
-    const result = await rootInstallerTest(['Binaries/Win64/UE4SS.dll'], GAME_ID);
+    const result = await rootTest(['Binaries/Win64/UE4SS.dll'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 
   test('rejects an archive whose layout does not include a recognized top-level segment', async () => {
-    const result = await rootInstallerTest(['mod.pak', 'README.md'], GAME_ID);
+    const result = await rootTest(['mod.pak', 'README.md'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects when gameId does not match', async () => {
-    const result = await rootInstallerTest(['Subnautica2/Content/Paks/mod.pak'], 'someotherGame');
+    const result = await rootTest(['Subnautica2/Content/Paks/mod.pak'], 'someotherGame');
     expect(result.supported).toBe(false);
   });
 });

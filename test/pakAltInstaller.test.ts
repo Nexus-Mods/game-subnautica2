@@ -1,36 +1,36 @@
-import { pakAltInstall, pakAltInstallerTest } from '../src/installers';
+import { pakAltInstall, pakAltTest } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_PAKALT = { type: 'setmodtype', value: 'subnautica2-pakalt' };
 
-describe('pakAltInstallerTest', () => {
+describe('pakAltTest', () => {
   test('accepts an archive that ships paks under a Paks/ segment without ~mods or LogicMods', async () => {
-    const result = await pakAltInstallerTest(['Paks/mod.pak'], GAME_ID);
+    const result = await pakAltTest(['Paks/mod.pak'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 
   test('rejects an archive that uses the ~mods folder (pak installer handles that)', async () => {
-    const result = await pakAltInstallerTest(['Paks/~mods/mod.pak'], GAME_ID);
+    const result = await pakAltTest(['Paks/~mods/mod.pak'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects an archive that uses the LogicMods folder', async () => {
-    const result = await pakAltInstallerTest(['Paks/LogicMods/x.pak'], GAME_ID);
+    const result = await pakAltTest(['Paks/LogicMods/x.pak'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects an archive that contains UE4SS Lua scripts', async () => {
-    const result = await pakAltInstallerTest(['Paks/mod.pak', 'Scripts/main.lua'], GAME_ID);
+    const result = await pakAltTest(['Paks/mod.pak', 'Scripts/main.lua'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects an archive that has paks but no Paks/ segment (pak installer handles that)', async () => {
-    const result = await pakAltInstallerTest(['mod.pak'], GAME_ID);
+    const result = await pakAltTest(['mod.pak'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects when gameId does not match', async () => {
-    const result = await pakAltInstallerTest(['Paks/mod.pak'], 'someotherGame');
+    const result = await pakAltTest(['Paks/mod.pak'], 'someotherGame');
     expect(result.supported).toBe(false);
   });
 });

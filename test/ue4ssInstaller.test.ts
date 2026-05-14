@@ -1,26 +1,26 @@
-import { ue4ssInstallerTest, ue4ssInstall } from '../src/installers';
+import { ue4ssTest, ue4ssInstall } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_UE4SS = { type: 'setmodtype', value: 'subnautica2-ue4ss' };
 
-describe('ue4ssInstallerTest', () => {
+describe('ue4ssTest', () => {
   test('accepts an archive with Scripts/main.lua', async () => {
-    const result = await ue4ssInstallerTest(['MyMod/Scripts/main.lua'], GAME_ID);
+    const result = await ue4ssTest(['MyMod/Scripts/main.lua'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 
   test('accepts an archive with enabled.txt + lua file', async () => {
-    const result = await ue4ssInstallerTest(['MyMod/enabled.txt', 'MyMod/script.lua'], GAME_ID);
+    const result = await ue4ssTest(['MyMod/enabled.txt', 'MyMod/script.lua'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 
   test('rejects a pure pak archive', async () => {
-    const result = await ue4ssInstallerTest(['mod_P.pak'], GAME_ID);
+    const result = await ue4ssTest(['mod_P.pak'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects when game id does not match', async () => {
-    const result = await ue4ssInstallerTest(['Scripts/main.lua'], 'someotherGame');
+    const result = await ue4ssTest(['Scripts/main.lua'], 'someotherGame');
     expect(result.supported).toBe(false);
   });
 });

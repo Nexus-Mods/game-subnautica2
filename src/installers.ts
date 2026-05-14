@@ -234,9 +234,9 @@ export const MOD_SPECS: readonly ModSpec[] = [
 
 // Per-installer test/install re-exports for test files.
 export const { test: ue4ssInjectorTest, install: ue4ssInjectorInstall } = ue4ssInjectorSpec;
-export const { test: logicModsInstallerTest, install: logicModsInstall } = logicModsSpec;
-export const { test: ue4ssInstallerTest, install: ue4ssInstall } = ue4ssSpec;
-export const { test: rootInstallerTest, install: rootInstall } = rootSpec;
-export const { test: contentFolderInstallerTest, install: contentFolderInstall } = contentFolderSpec;
-export const { test: pakAltInstallerTest, install: pakAltInstall } = pakAltSpec;
-export const { test: pakInstallerTest, install: pakInstall } = pakSpec;
+export const { test: logicModsTest, install: logicModsInstall } = logicModsSpec;
+export const { test: ue4ssTest, install: ue4ssInstall } = ue4ssSpec;
+export const { test: rootTest, install: rootInstall } = rootSpec;
+export const { test: contentFolderTest, install: contentFolderInstall } = contentFolderSpec;
+export const { test: pakAltTest, install: pakAltInstall } = pakAltSpec;
+export const { test: pakTest, install: pakInstall } = pakSpec;

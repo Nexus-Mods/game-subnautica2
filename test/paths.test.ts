@@ -1,4 +1,4 @@
-import { toPosix, splitSegments, hasSegment, joinRel } from '../src/util/paths';
+import { toPosix, splitSegments, hasSegment, joinRel, basename, dirname, stem, pathAfterSegment } from '../src/util/paths';
 
 describe('toPosix', () => {
   test('converts backslashes to forward slashes', () => {
@@ -70,5 +70,77 @@ describe('joinRel', () => {
 
   test('zero arguments returns empty string', () => {
     expect(joinRel()).toBe('');
+  });
+});
+
+describe('basename', () => {
+  test('returns the last segment of a posix path', () => {
+    expect(basename('a/b/c.pak')).toBe('c.pak');
+  });
+
+  test('returns the last segment of a windows path', () => {
+    expect(basename('a\\b\\c.pak')).toBe('c.pak');
+  });
+
+  test('returns the whole string when no separator exists', () => {
+    expect(basename('file.pak')).toBe('file.pak');
+  });
+
+  test('handles mixed separators', () => {
+    expect(basename('a/b\\c.pak')).toBe('c.pak');
+  });
+});
+
+describe('dirname', () => {
+  test('returns everything before the last separator (posix)', () => {
+    expect(dirname('a/b/c.pak')).toBe('a/b');
+  });
+
+  test('returns everything before the last separator (windows)', () => {
+    expect(dirname('a\\b\\c.pak')).toBe('a\\b');
+  });
+
+  test('returns empty string when no separator exists', () => {
+    expect(dirname('file.pak')).toBe('');
+  });
+});
+
+describe('stem', () => {
+  test('returns the filename without extension', () => {
+    expect(stem('mod_P.pak')).toBe('mod_P');
+  });
+
+  test('strips only the last extension', () => {
+    expect(stem('mod.backup.pak')).toBe('mod.backup');
+  });
+
+  test('returns the full name when no extension exists', () => {
+    expect(stem('README')).toBe('README');
+  });
+
+  test('works on full paths (uses basename first)', () => {
+    expect(stem('a/b/mod_P.pak')).toBe('mod_P');
+  });
+});
+
+describe('pathAfterSegment', () => {
+  test('returns the path tail after a matching segment (case-insensitive)', () => {
+    expect(pathAfterSegment('mod/LogicMods/x.pak', 'logicmods')).toBe('x.pak');
+  });
+
+  test('returns nested path after segment', () => {
+    expect(pathAfterSegment('root/Paks/sub/file.pak', 'paks')).toBe('sub/file.pak');
+  });
+
+  test('returns null when segment is not found', () => {
+    expect(pathAfterSegment('a/b/c.pak', 'logicmods')).toBeNull();
+  });
+
+  test('returns empty string when segment is the last component', () => {
+    expect(pathAfterSegment('a/b/LogicMods', 'logicmods')).toBe('');
+  });
+
+  test('handles windows paths', () => {
+    expect(pathAfterSegment('mod\\LogicMods\\x.pak', 'logicmods')).toBe('x.pak');
   });
 });

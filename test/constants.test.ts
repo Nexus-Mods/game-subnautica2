@@ -25,7 +25,7 @@ describe('constants', () => {
   });
 
   test('mod paths are relative (no leading slash, no drive letter)', () => {
-    for (const p of [c.PAK_MODS_RELPATH, c.LOGIC_MODS_RELPATH, c.UE4SS_MODS_RELPATH]) {
+    for (const p of [c.PAK_MODS_RELPATH, c.LOGIC_MODS_RELPATH]) {
       expect(p.startsWith('/')).toBe(false);
       expect(p.startsWith('\\')).toBe(false);
       expect(p).not.toMatch(/^[A-Za-z]:/);
@@ -38,10 +38,6 @@ describe('constants', () => {
 
   test('LOGIC_MODS_RELPATH routes to Content/Paks/LogicMods under INSTALL_DIR', () => {
     expect(c.LOGIC_MODS_RELPATH).toBe('Subnautica2/Content/Paks/LogicMods');
-  });
-
-  test('UE4SS_MODS_RELPATH routes to Binaries/Win64/ue4ss/Mods under INSTALL_DIR', () => {
-    expect(c.UE4SS_MODS_RELPATH).toBe('Subnautica2/Binaries/Win64/ue4ss/Mods');
   });
 
   test('IDs contain no whitespace', () => {

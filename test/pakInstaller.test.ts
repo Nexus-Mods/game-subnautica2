@@ -1,42 +1,42 @@
-import { pakInstallerTest, pakInstall } from '../src/installers';
+import { pakTest, pakInstall } from '../src/installers';
 
 const GAME_ID = 'subnautica2';
 const SETMODTYPE_PAK = { type: 'setmodtype', value: 'subnautica2-pak' };
 
-describe('pakInstallerTest', () => {
+describe('pakTest', () => {
   test('accepts a single .pak file', async () => {
-    const result = await pakInstallerTest(['mod_P.pak'], GAME_ID);
+    const result = await pakTest(['mod_P.pak'], GAME_ID);
     expect(result.supported).toBe(true);
     expect(result.requiredFiles).toEqual([]);
   });
 
   test('accepts a pak + ucas + utoc trio (UE5 IO Store)', async () => {
-    const result = await pakInstallerTest(['x_P.pak', 'x_P.ucas', 'x_P.utoc'], GAME_ID);
+    const result = await pakTest(['x_P.pak', 'x_P.ucas', 'x_P.utoc'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 
   test('rejects an archive containing a LogicMods/ segment (logicMods installer wins)', async () => {
-    const result = await pakInstallerTest(['LogicMods/y.pak'], GAME_ID);
+    const result = await pakTest(['LogicMods/y.pak'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects an archive containing UE4SS Lua scripts (ue4ss installer wins)', async () => {
-    const result = await pakInstallerTest(['mod/Scripts/main.lua'], GAME_ID);
+    const result = await pakTest(['mod/Scripts/main.lua'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('rejects when game id does not match', async () => {
-    const result = await pakInstallerTest(['mod_P.pak'], 'someotherGame');
+    const result = await pakTest(['mod_P.pak'], 'someotherGame');
     expect(result.supported).toBe(false);
   });
 
   test('rejects an archive with no pak files', async () => {
-    const result = await pakInstallerTest(['readme.txt'], GAME_ID);
+    const result = await pakTest(['readme.txt'], GAME_ID);
     expect(result.supported).toBe(false);
   });
 
   test('accepts IO Store only mods (.utoc + .ucas, no .pak)', async () => {
-    const result = await pakInstallerTest(['mod_P.utoc', 'mod_P.ucas'], GAME_ID);
+    const result = await pakTest(['mod_P.utoc', 'mod_P.ucas'], GAME_ID);
     expect(result.supported).toBe(true);
   });
 });

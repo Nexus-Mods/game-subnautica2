@@ -4,13 +4,12 @@ import {
   NEXUS_ID,
 } from '../constants';
 import { resolveGamePath, ue4ssInjectorPath, ue4ssModsPath } from '../game';
+import type { RelPath } from '../installers';
 
 interface VortexDiscovery {
   path?: string;
   store?: string;
 }
-
-type RelPath = string | ((isXbox: boolean) => string);
 
 function getDiscovery(api: types.IExtensionApi): VortexDiscovery | undefined {
   return (

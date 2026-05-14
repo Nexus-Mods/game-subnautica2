@@ -12,7 +12,6 @@ export const ARCH_WINGDK = 'WinGDK';
 
 export const PAK_MODS_RELPATH = `${INSTALL_DIR}/Content/Paks/~mods`;
 export const LOGIC_MODS_RELPATH = `${INSTALL_DIR}/Content/Paks/LogicMods`;
-export const UE4SS_MODS_RELPATH = `${INSTALL_DIR}/Binaries/${ARCH_WIN64}/ue4ss/Mods`;
 
 export const MOD_TYPE_PAK = 'subnautica2-pak';
 export const MOD_TYPE_LOGICMODS = 'subnautica2-logicmods';
@@ -22,8 +21,6 @@ export const MOD_TYPE_ROOT = 'subnautica2-root';
 export const MOD_TYPE_CONTENT_FOLDER = 'subnautica2-contentfolder';
 export const MOD_TYPE_PAK_ALT = 'subnautica2-pakalt';
 
-export const UE4SS_DWMAPI_FILE = 'dwmapi.dll';
-export const UE4SS_XINPUT_FILE = 'xinput1_4.dll';
 export const UE4SS_SETTINGS_FILE = 'UE4SS-settings.ini';
 
 export const IGNORE_CONFLICTS = ['enabled.txt', 'mods.txt', 'UE4SS-settings.ini'];

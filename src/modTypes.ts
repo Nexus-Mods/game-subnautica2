@@ -20,12 +20,10 @@ export function registerModTypes(context: types.IExtensionContext): void {
       spec.priority,
       isThisGame,
       (game) => {
-        const state = (context.api as unknown as { store?: { getState?: () => unknown } }).store?.getState?.();
-        const discovery = state
-          ? (selectors.discoveryByGame as unknown as
-              (s: unknown, g: string) => { path?: string; store?: string } | undefined
-            )(state, game.id)
-          : undefined;
+        const state = context.api.getState();
+        const discovery = (selectors.discoveryByGame as unknown as
+          (s: unknown, g: string) => { path?: string; store?: string } | undefined
+        )(state, game.id);
         if (!discovery?.path) return '';
         const isXbox = discovery.store === 'xbox';
         const rel = typeof mt.destPath === 'function' ? mt.destPath(isXbox) : mt.destPath;
