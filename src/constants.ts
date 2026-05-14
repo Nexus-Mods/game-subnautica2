@@ -2,16 +2,7 @@ export const GAME_ID = 'subnautica2';
 export const NEXUS_ID = 'subnautica2';
 
 export const STEAMAPP_ID = '1962700';
-export const STEAM_INSTALL_DIR = 'Subnautica2';
-
 export const EPIC_CATALOG_ITEM_ID = '22bfc34d90b64054809542014fc9eb32';
-export const EPIC_NAMESPACE = '4e06466623c6447bbcb4b8e9f0b1c14e';
-export const EPIC_OFFER_ID = 'f62779dfd38343d58f59ec60540f6260';
-export const EPIC_URL_SLUG = 'subnautica-2-d27f94';
-export const EPIC_INSTALL_DIR: string | null = null;
-
-export const XBOX_PRODUCT_ID = '9PJPCB188SVG';
-export const XBOX_PFN: string | null = null;
 
 export const INSTALL_DIR = 'Subnautica2';
 export const EXEC = 'Subnautica2.exe';
@@ -34,8 +25,6 @@ export const MOD_TYPE_PAK_ALT = 'subnautica2-pakalt';
 export const UE4SS_DWMAPI_FILE = 'dwmapi.dll';
 export const UE4SS_XINPUT_FILE = 'xinput1_4.dll';
 export const UE4SS_SETTINGS_FILE = 'UE4SS-settings.ini';
-
-export const UE4SS_RELEASES_URL = 'https://github.com/UE4SS-RE/RE-UE4SS/releases';
 
 export const IGNORE_CONFLICTS = ['enabled.txt', 'mods.txt', 'UE4SS-settings.ini'];
 export const IGNORE_DEPLOY = ['mods.txt'];

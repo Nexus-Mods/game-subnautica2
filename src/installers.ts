@@ -15,7 +15,7 @@ import {
   containsLogicMods,
   containsUE4SSScripts,
   filterFiles,
-  findPaksWithSiblings,
+  findPakGroups,
   hasAnyExt,
   hasExt,
 } from './util/archive';
@@ -164,7 +164,6 @@ const ROOT_TOP_LEVEL_DIRS = [INSTALL_DIR, 'Engine', 'Binaries'];
 export const rootSpec = makeInstaller({
   id: MOD_TYPE_ROOT,
   priority: 23,
-  modType: { name: 'Root (game folder layout)', destPath: '' },
   accept: (files) => ROOT_TOP_LEVEL_DIRS.some((dir) => files.some((f) => hasSegment(f, dir))),
   route: (files) => files.map((source) => ({ source, destination: source })),
 });
@@ -215,10 +214,10 @@ export const pakSpec = makeInstaller({
   id: MOD_TYPE_PAK,
   priority: 30,
   losesTo: LOSES_TO_HIGHER_PRIORITY,
-  accept: (files) => findPaksWithSiblings(files).length > 0,
+  accept: (files) => findPakGroups(files).length > 0,
   route: (files) =>
-    findPaksWithSiblings(files).flatMap((g) =>
-      [g.pak, ...g.siblings].map((source) => ({ source, destination: basename(source) })),
+    findPakGroups(files).flatMap((g) =>
+      g.files.map((source) => ({ source, destination: basename(source) })),
     ),
 });
 

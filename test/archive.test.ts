@@ -1,7 +1,7 @@
 import {
   filterFiles,
   hasExt,
-  findPaksWithSiblings,
+  findPakGroups,
   containsLogicMods,
   containsUE4SSScripts,
 } from '../src/util/archive';
@@ -35,45 +35,60 @@ describe('hasExt', () => {
   });
 });
 
-describe('findPaksWithSiblings', () => {
+describe('findPakGroups', () => {
   test('groups a pak with its .ucas and .utoc siblings (same base, same dir)', () => {
     const files = ['mod_P.pak', 'mod_P.ucas', 'mod_P.utoc'];
-    expect(findPaksWithSiblings(files)).toEqual([
-      { pak: 'mod_P.pak', siblings: ['mod_P.ucas', 'mod_P.utoc'] },
+    expect(findPakGroups(files)).toEqual([
+      { files: ['mod_P.pak', 'mod_P.ucas', 'mod_P.utoc'] },
     ]);
   });
 
-  test('returns a pak with empty siblings when no sibling files exist', () => {
-    expect(findPaksWithSiblings(['solo_P.pak'])).toEqual([
-      { pak: 'solo_P.pak', siblings: [] },
+  test('returns a single-file group when no sibling files exist', () => {
+    expect(findPakGroups(['solo_P.pak'])).toEqual([
+      { files: ['solo_P.pak'] },
     ]);
   });
 
-  test('handles multiple paks in different folders', () => {
+  test('handles multiple groups in different folders', () => {
     const files = [
       'a/x_P.pak', 'a/x_P.ucas', 'a/x_P.utoc',
       'b/y_P.pak',
     ];
-    const result = findPaksWithSiblings(files);
+    const result = findPakGroups(files);
     expect(result).toHaveLength(2);
-    expect(result).toContainEqual({ pak: 'a/x_P.pak', siblings: ['a/x_P.ucas', 'a/x_P.utoc'] });
-    expect(result).toContainEqual({ pak: 'b/y_P.pak', siblings: [] });
+    expect(result).toContainEqual({ files: ['a/x_P.pak', 'a/x_P.ucas', 'a/x_P.utoc'] });
+    expect(result).toContainEqual({ files: ['b/y_P.pak'] });
   });
 
   test('does not group files with the same basename in different directories', () => {
     const files = ['a/mod.pak', 'b/mod.utoc'];
-    const result = findPaksWithSiblings(files);
-    expect(result).toEqual([{ pak: 'a/mod.pak', siblings: [] }]);
+    const result = findPakGroups(files);
+    expect(result).toHaveLength(2);
+    expect(result).toContainEqual({ files: ['a/mod.pak'] });
+    expect(result).toContainEqual({ files: ['b/mod.utoc'] });
   });
 
   test('ignores non-pak files', () => {
-    expect(findPaksWithSiblings(['readme.txt', 'image.png'])).toEqual([]);
+    expect(findPakGroups(['readme.txt', 'image.png'])).toEqual([]);
   });
 
   test('handles windows-style separators', () => {
     const files = ['mods\\x_P.pak', 'mods\\x_P.utoc'];
-    expect(findPaksWithSiblings(files)).toEqual([
-      { pak: 'mods\\x_P.pak', siblings: ['mods\\x_P.utoc'] },
+    expect(findPakGroups(files)).toEqual([
+      { files: ['mods\\x_P.pak', 'mods\\x_P.utoc'] },
+    ]);
+  });
+
+  test('accepts IO Store only mods (.utoc + .ucas, no .pak)', () => {
+    const files = ['mod_P.utoc', 'mod_P.ucas'];
+    expect(findPakGroups(files)).toEqual([
+      { files: ['mod_P.utoc', 'mod_P.ucas'] },
+    ]);
+  });
+
+  test('accepts a standalone .utoc file', () => {
+    expect(findPakGroups(['solo.utoc'])).toEqual([
+      { files: ['solo.utoc'] },
     ]);
   });
 });

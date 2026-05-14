@@ -1,5 +1,5 @@
 import { dirname, stem } from './paths';
-import { getLogicModsPatterns, getUE4SSPatterns, matchesAnyPattern } from '../stopPatterns';
+import { PAK_EXTENSIONS, getLogicModsPatterns, getUE4SSPatterns, matchesAnyPattern } from '../stopPatterns';
 
 export function filterFiles(entries: readonly string[]): string[] {
   return entries.filter((e) => !e.endsWith('/') && !e.endsWith('\\'));
@@ -16,28 +16,23 @@ export function hasAnyExt(file: string, exts: readonly string[]): boolean {
 }
 
 export interface PakGroup {
-  pak: string;
-  siblings: string[];
+  files: string[];
 }
 
-const PAK_SIBLING_EXTS = ['ucas', 'utoc'] as const;
-
-export function findPaksWithSiblings(files: readonly string[]): PakGroup[] {
+export function findPakGroups(files: readonly string[]): PakGroup[] {
   const entries = filterFiles(files);
-  return entries
-    .filter((f) => hasExt(f, 'pak'))
-    .map((pak) => {
-      const pakDir = dirname(pak);
-      const pakStem = stem(pak);
-      const siblings = entries.filter(
-        (f) =>
-          f !== pak &&
-          dirname(f) === pakDir &&
-          stem(f) === pakStem &&
-          hasAnyExt(f, PAK_SIBLING_EXTS),
-      );
-      return { pak, siblings };
-    });
+  const groups = new Map<string, string[]>();
+  for (const f of entries) {
+    if (!hasAnyExt(f, PAK_EXTENSIONS)) continue;
+    const key = `${dirname(f)}\0${stem(f)}`;
+    let list = groups.get(key);
+    if (!list) {
+      list = [];
+      groups.set(key, list);
+    }
+    list.push(f);
+  }
+  return Array.from(groups.values()).map((g) => ({ files: g }));
 }
 
 export function containsLogicMods(files: readonly string[]): boolean {

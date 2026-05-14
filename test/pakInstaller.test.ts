@@ -34,6 +34,11 @@ describe('pakInstallerTest', () => {
     const result = await pakInstallerTest(['readme.txt'], GAME_ID);
     expect(result.supported).toBe(false);
   });
+
+  test('accepts IO Store only mods (.utoc + .ucas, no .pak)', async () => {
+    const result = await pakInstallerTest(['mod_P.utoc', 'mod_P.ucas'], GAME_ID);
+    expect(result.supported).toBe(true);
+  });
 });
 
 describe('pakInstall', () => {
@@ -68,6 +73,15 @@ describe('pakInstall', () => {
     expect(result.instructions).toEqual([
       SETMODTYPE_PAK,
       { type: 'copy', source: 'x_P.pak', destination: 'x_P.pak' },
+    ]);
+  });
+
+  test('routes IO Store only mods (.utoc + .ucas, no .pak)', async () => {
+    const result = await pakInstall(['mod_P.utoc', 'mod_P.ucas']);
+    expect(result.instructions).toEqual([
+      SETMODTYPE_PAK,
+      { type: 'copy', source: 'mod_P.utoc', destination: 'mod_P.utoc' },
+      { type: 'copy', source: 'mod_P.ucas', destination: 'mod_P.ucas' },
     ]);
   });
 });

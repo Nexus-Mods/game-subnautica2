@@ -1,13 +1,10 @@
 import Bluebird from 'bluebird';
-import { log, types } from 'vortex-api';
+import { log, types, util } from 'vortex-api';
 import {
   GAME_ID,
   EXEC,
   STEAMAPP_ID,
   EPIC_CATALOG_ITEM_ID,
-  EPIC_INSTALL_DIR,
-  XBOX_PRODUCT_ID,
-  XBOX_PFN,
   NEXUS_ID,
   PAK_MODS_RELPATH,
   INSTALL_DIR,
@@ -25,13 +22,12 @@ import {
   regenerateModsFile,
 } from './util/ue4ssState';
 import { MOD_SPECS } from './installers';
-import { registerHealthChecks } from './healthChecks';
 
-const queryArgs = {
-  steam: [{ id: STEAMAPP_ID, prefer: 0 }],
-  epic: [{ id: EPIC_CATALOG_ITEM_ID }],
-  xbox: [{ id: XBOX_PRODUCT_ID }],
-};
+function findGame(): Bluebird<string> {
+  const ids = [STEAMAPP_ID, EPIC_CATALOG_ITEM_ID];
+  return util.GameStoreHelper.findByAppId(ids)
+    .then((entry: { gamePath: string }) => entry.gamePath);
+}
 
 const TOOLBAR_ACTIONS: readonly { priority: number; title: string; run: (api: types.IExtensionApi) => void }[] = [
   { priority: 200, title: 'Open UE4SS Settings INI', run: (api) => openInjectorFile(api, UE4SS_SETTINGS_FILE) },
@@ -39,24 +35,12 @@ const TOOLBAR_ACTIONS: readonly { priority: number; title: string; run: (api: ty
   { priority: 202, title: 'Open Nexus Page', run: () => openNexusPage() },
 ];
 
-function warnIfConstantsUnresolved(): void {
-  const missing: string[] = [];
-  if (EPIC_INSTALL_DIR === null) missing.push('EPIC_INSTALL_DIR');
-  if (XBOX_PFN === null) missing.push('XBOX_PFN');
-  if (missing.length === 0) return;
-  log(
-    'warn',
-    `Subnautica 2: unresolved post-launch constants — ${missing.join(', ')}. ` +
-      'Update src/constants.ts after verifying values on an actual install.',
-  );
-}
-
 function init(context: types.IExtensionContext): boolean {
   context.registerGame({
     id: GAME_ID,
     name: 'Subnautica 2',
     mergeMods: true,
-    queryArgs,
+    queryPath: findGame,
     queryModPath: () => PAK_MODS_RELPATH,
     logo: 'gameart.webp',
     executable: () => EXEC,
@@ -66,7 +50,6 @@ function init(context: types.IExtensionContext): boolean {
     details: {
       steamAppId: Number(STEAMAPP_ID),
       epicAppId: EPIC_CATALOG_ITEM_ID,
-      xboxAppId: XBOX_PRODUCT_ID,
       nexusPageId: NEXUS_ID,
       supportsSymlinks: true,
       gameProjectFolder: INSTALL_DIR,
@@ -93,11 +76,7 @@ function init(context: types.IExtensionContext): boolean {
     context.registerInstaller(spec.id, spec.priority, spec.test as never, spec.install as never);
   }
 
-  registerHealthChecks(context);
-
   context.once(() => {
-    warnIfConstantsUnresolved();
-
     context.api.onAsync('did-deploy', async () => {
       if (!isThisGameActive(context.api)) return;
       try {

@@ -2,12 +2,10 @@ import { beforeEach, vi, type Mock } from 'vitest';
 import { fs, selectors, types, util } from 'vortex-api';
 import {
   isThisGameActive,
-  isUE4SSInstalled,
   openInjectorFile,
   openModsFile,
   openNexusPage,
   regenerateModsFile,
-  ue4ssProxyAbsolutePath,
 } from '../src/util/ue4ssState';
 
 const mockedDiscovery = selectors.discoveryByGame as unknown as Mock;
@@ -40,43 +38,6 @@ beforeEach(() => {
   mockedReaddir.mockReset();
   mockedWrite.mockReset();
   mockedOpn.mockReset();
-});
-
-describe('ue4ssProxyAbsolutePath', () => {
-  test('Steam discovery resolves to <gamePath>/Subnautica2/Binaries/Win64/dwmapi.dll', () => {
-    expect(ue4ssProxyAbsolutePath({ path: '/games/Subnautica2', store: 'steam' })).toBe(
-      '/games/Subnautica2/Subnautica2/Binaries/Win64/dwmapi.dll',
-    );
-  });
-
-  test('Xbox discovery uses flat layout + xinput1_4.dll proxy', () => {
-    expect(ue4ssProxyAbsolutePath({ path: '/xbox/Subnautica2', store: 'xbox' })).toBe(
-      '/xbox/Subnautica2/Binaries/WinGDK/xinput1_4.dll',
-    );
-  });
-
-  test('returns undefined when discovery has no path', () => {
-    expect(ue4ssProxyAbsolutePath({ store: 'steam' })).toBeUndefined();
-  });
-});
-
-describe('isUE4SSInstalled', () => {
-  test('returns true when statAsync resolves for the proxy DLL', async () => {
-    mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
-    mockedStat.mockResolvedValueOnce({ isDirectory: () => false });
-    expect(await isUE4SSInstalled(asExtensionApi(makeApi()))).toBe(true);
-  });
-
-  test('returns false when statAsync rejects (file missing)', async () => {
-    mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
-    mockedStat.mockRejectedValueOnce(new Error('ENOENT'));
-    expect(await isUE4SSInstalled(asExtensionApi(makeApi()))).toBe(false);
-  });
-
-  test('returns false when the game is not discovered', async () => {
-    mockedDiscovery.mockReturnValue(undefined);
-    expect(await isUE4SSInstalled(asExtensionApi(makeApi()))).toBe(false);
-  });
 });
 
 describe('isThisGameActive', () => {

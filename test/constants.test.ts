@@ -14,11 +14,6 @@ describe('constants', () => {
     expect(c.EPIC_CATALOG_ITEM_ID).toMatch(/^[0-9a-f]{32}$/);
   });
 
-  test('XBOX_PRODUCT_ID is the Microsoft Store product ID "9PJPCB188SVG"', () => {
-    expect(c.XBOX_PRODUCT_ID).toBe('9PJPCB188SVG');
-    expect(c.XBOX_PRODUCT_ID).toMatch(/^9[A-Z0-9]{11}$/);
-  });
-
   test('INSTALL_DIR is the on-disk folder name "Subnautica2"', () => {
     expect(c.INSTALL_DIR).toBe('Subnautica2');
   });
@@ -50,7 +45,7 @@ describe('constants', () => {
   });
 
   test('IDs contain no whitespace', () => {
-    for (const v of [c.GAME_ID, c.STEAMAPP_ID, c.EPIC_CATALOG_ITEM_ID, c.XBOX_PRODUCT_ID, c.INSTALL_DIR, c.EXEC]) {
+    for (const v of [c.GAME_ID, c.STEAMAPP_ID, c.EPIC_CATALOG_ITEM_ID, c.INSTALL_DIR, c.EXEC]) {
       expect(v).not.toMatch(/\s/);
     }
   });

@@ -102,7 +102,7 @@ or install Info-ZIP).
 | `src/installers/logicModsInstaller.ts` | Routes archives containing a `LogicMods/` segment. |
 | `src/installers/ue4ssInstaller.ts` | Routes Lua-based UE4SS mods. |
 | `src/util/paths.ts` | Pure path helpers (`toPosix`, `splitSegments`, `hasSegment`, `joinRel`). |
-| `src/util/archive.ts` | Pure file-list inspection (`findPaksWithSiblings`, `containsLogicMods`, `containsUE4SSScripts`). |
+| `src/util/archive.ts` | Pure file-list inspection (`findPakGroups`, `containsLogicMods`, `containsUE4SSScripts`). |
 | `test/` | Jest unit tests for every pure module. |
 | `test/__mocks__/vortex-api.ts` | Stub used by Jest in place of the real `vortex-api` (which is electron-bound). |
 
@@ -123,8 +123,9 @@ verification against an actual install. Each is a one-line PR:
 4. **LogicMods path** — currently `Content/Paks/LogicMods/`. One community
    source suggests `Binaries/Win64/Mods/LogicMods/` instead. Drop a known
    LogicMod into each and see which the game loads.
-5. **IO Store (`.ucas`/`.utoc`)** — verify whether mods need sibling files
-   alongside `.pak`. The pak installer already groups them.
+5. ~~**IO Store (`.ucas`/`.utoc`)**~~ — **resolved.** The pak installer
+   groups files by stem, supporting `.pak`-only, `.pak`+`.ucas`+`.utoc`
+   triplets, and IO Store only (`.utoc`+`.ucas`, no `.pak`).
 6. **Pak signature enforcement** — try loading an unsigned pak; if it fails,
    add a sig-bypass option.
 
