@@ -136,8 +136,21 @@ export const logicModsSpec = makeInstaller({
 
 // --- UE4SS Lua scripts (priority 22) ---
 
-function isUE4SSScriptFile(file: string): boolean {
-  return basename(file).toLowerCase() === 'enabled.txt' || hasExt(file, 'lua');
+// Locate the mod-root directory inside the archive by picking the shallowest
+// Lua-mod signal (`.lua` file or `enabled.txt`) and walking one level above a
+// `Scripts/` parent if present. Returns the empty string when the marker is at
+// the archive root, signalling a malformed archive that has no mod folder to
+// copy under.
+function findUE4SSModRoot(files: readonly string[]): string | undefined {
+  const marker = files
+    .map(toPosix)
+    .filter((f) => hasExt(f, 'lua') || basename(f).toLowerCase() === 'enabled.txt')
+    .sort((a, b) => splitSegments(a).length - splitSegments(b).length)[0];
+  if (marker === undefined) return undefined;
+  const parent = splitSegments(dirname(marker));
+  return parent[parent.length - 1]?.toLowerCase() === 'scripts'
+    ? parent.slice(0, -1).join('/')
+    : parent.join('/');
 }
 
 export const ue4ssSpec = makeInstaller({
@@ -145,16 +158,19 @@ export const ue4ssSpec = makeInstaller({
   priority: 22,
   modType: { name: 'UE4SS (Lua scripts)', destPath: ue4ssModsPath },
   accept: containsUE4SSScripts,
-  route: (files) =>
-    files.filter(isUE4SSScriptFile).map((source) => {
-      const segs = splitSegments(source);
-      if (segs.length === 1) {
-        const only = segs[0]!;
-        const stem = only.replace(/\.[^.]+$/, '');
-        return { source, destination: `${stem}/${only}` };
-      }
-      return { source, destination: `${segs[0]}/${segs.slice(1).join('/')}` };
-    }),
+  route: (files) => {
+    const root = findUE4SSModRoot(files);
+    if (root === undefined || root === '') return [];
+    const stripPrefix = dirname(root);
+    const underRoot = (f: string): boolean => {
+      const norm = toPosix(f);
+      return norm === root || norm.startsWith(`${root}/`);
+    };
+    return files.filter(underRoot).map((source) => {
+      const norm = toPosix(source);
+      return { source, destination: stripPrefix === '' ? norm : norm.slice(stripPrefix.length + 1) };
+    });
+  },
 });
 
 // --- Root (priority 23) ---
