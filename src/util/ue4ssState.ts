@@ -2,6 +2,7 @@ import { fs, selectors, types, util } from 'vortex-api';
 import {
   GAME_ID,
   NEXUS_ID,
+  UE4SS_SETTINGS_FILE,
 } from '../constants';
 import { resolveGamePath, ue4ssInjectorPath, ue4ssModsPath } from '../game';
 import type { RelPath } from '../installers';
@@ -37,8 +38,10 @@ export function isThisGameActive(api: types.IExtensionApi): boolean {
   return getActiveGameId(api) === GAME_ID;
 }
 
-export function openInjectorFile(api: types.IExtensionApi, filename: string): void {
-  const target = gameAbsPath(api, (isXbox) => `${ue4ssInjectorPath(isXbox)}/${filename}`);
+export function openUE4SSSettingsIni(api: types.IExtensionApi): void {
+  // UE4SS 3.x places the settings file inside a ue4ss/ subdir of the injector
+  // dir; the injector DLLs themselves stay one level up at Binaries/<arch>/.
+  const target = gameAbsPath(api, (isXbox) => `${ue4ssInjectorPath(isXbox)}/ue4ss/${UE4SS_SETTINGS_FILE}`);
   if (target !== undefined) opn(target);
 }
 
