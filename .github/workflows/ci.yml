@@ -83,3 +83,12 @@ jobs:
           display_name: Subnautica 2 Support for Vortex
           filename: out/${{ steps.meta.outputs.zip_name }}
           version: ${{ steps.meta.outputs.version }}
+          archive_existing_file: true
+
+      - name: Update Nexus Mods page version
+        run: |
+          curl -sf -X POST \
+            "https://api.nexusmods.com/v1/games/site/mods/1891/edit.json" \
+            -H "apikey: ${{ secrets.NEXUS_API_KEY }}" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "version=${{ steps.meta.outputs.version }}"
