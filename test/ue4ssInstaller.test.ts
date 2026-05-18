@@ -73,6 +73,29 @@ describe('ue4ssInstall', () => {
     ]);
   });
 
+  test('strips a deep game-relative path baked into a Lua mod archive', async () => {
+    // Real archive layout for "Mod Settings for Subnautica 2" (subnautica2/20):
+    // ships its files at the full game-relative install path rather than just
+    // the mod folder.
+    const result = await ue4ssInstall([
+      'Subnautica2/Binaries/Win64/ue4ss/Mods/SN2ModSettings/enabled.txt',
+      'Subnautica2/Binaries/Win64/ue4ss/Mods/SN2ModSettings/Scripts/main.lua',
+    ]);
+    expect(result.instructions).toEqual([
+      SETMODTYPE_UE4SS,
+      {
+        type: 'copy',
+        source: 'Subnautica2/Binaries/Win64/ue4ss/Mods/SN2ModSettings/enabled.txt',
+        destination: 'SN2ModSettings/enabled.txt',
+      },
+      {
+        type: 'copy',
+        source: 'Subnautica2/Binaries/Win64/ue4ss/Mods/SN2ModSettings/Scripts/main.lua',
+        destination: 'SN2ModSettings/Scripts/main.lua',
+      },
+    ]);
+  });
+
   test('drops files outside the mod root', async () => {
     const result = await ue4ssInstall(['MyMod/Scripts/main.lua', 'README.md', 'desktop.ini']);
     expect(result.instructions).toEqual([
