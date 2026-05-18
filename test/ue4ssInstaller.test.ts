@@ -104,6 +104,21 @@ describe('ue4ssInstall', () => {
     ]);
   });
 
+  test('skips OS metadata files nested inside the mod root', async () => {
+    const result = await ue4ssInstall([
+      'MyMod/enabled.txt',
+      'MyMod/Scripts/main.lua',
+      'MyMod/Thumbs.db',
+      'MyMod/Scripts/.DS_Store',
+      'MyMod/Assets/desktop.ini',
+    ]);
+    expect(result.instructions).toEqual([
+      SETMODTYPE_UE4SS,
+      { type: 'copy', source: 'MyMod/enabled.txt', destination: 'MyMod/enabled.txt' },
+      { type: 'copy', source: 'MyMod/Scripts/main.lua', destination: 'MyMod/Scripts/main.lua' },
+    ]);
+  });
+
   test('emits no copy instructions for a malformed loose-lua archive', async () => {
     // A bare `script.lua` at the archive root has no mod-root folder to copy
     // under, so the installer routes nothing rather than dropping the file at

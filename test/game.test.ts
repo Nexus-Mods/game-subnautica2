@@ -5,6 +5,7 @@ import {
   resolveModPaths,
   ue4ssInjectorPath,
   ue4ssModsPath,
+  ue4ssRootPath,
 } from '../src/game';
 import { fs } from 'vortex-api';
 
@@ -71,6 +72,16 @@ describe('ue4ssInjectorPath', () => {
 
   test('Xbox path uses WinGDK arch', () => {
     expect(ue4ssInjectorPath(true)).toBe('Subnautica2/Binaries/WinGDK');
+  });
+});
+
+describe('ue4ssRootPath', () => {
+  test('Steam path hangs ue4ss under Binaries/Win64', () => {
+    expect(ue4ssRootPath(false)).toBe('Subnautica2/Binaries/Win64/ue4ss');
+  });
+
+  test('Xbox path hangs ue4ss under Binaries/WinGDK', () => {
+    expect(ue4ssRootPath(true)).toBe('Subnautica2/Binaries/WinGDK/ue4ss');
   });
 });
 

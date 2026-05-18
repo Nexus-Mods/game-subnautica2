@@ -137,11 +137,22 @@ export const logicModsSpec = makeInstaller({
 
 // --- UE4SS Lua scripts (priority 22) ---
 
+// OS-generated metadata files we never want to copy into the mod folder.
+const STRAY_METADATA_NAMES: readonly string[] = ['thumbs.db', '.ds_store', 'desktop.ini'];
+
+function isStrayMetadata(file: string): boolean {
+  return STRAY_METADATA_NAMES.includes(basename(file).toLowerCase());
+}
+
 // Locate the mod-root directory inside the archive by picking the shallowest
 // Lua-mod signal (`.lua` file or `enabled.txt`) and walking one level above a
-// `Scripts/` parent if present. Returns the empty string when the marker is at
-// the archive root, signalling a malformed archive that has no mod folder to
-// copy under.
+// `Scripts/` parent if present. Returns undefined when there is no marker, or
+// when the marker sits at the archive root with no mod folder to copy under.
+//
+// Limitation: a single archive that bundles multiple sibling mods (e.g.
+// `ModA/enabled.txt` + `ModB/enabled.txt`) yields only the first mod root by
+// sort order; files under any other sibling are silently dropped. No real-
+// world Nexus archives exhibit this layout today; revisit if that changes.
 function findUE4SSModRoot(files: readonly string[]): string | undefined {
   const marker = files
     .map(toPosix)
@@ -149,9 +160,10 @@ function findUE4SSModRoot(files: readonly string[]): string | undefined {
     .sort((a, b) => splitSegments(a).length - splitSegments(b).length)[0];
   if (marker === undefined) return undefined;
   const parent = splitSegments(dirname(marker));
-  return parent[parent.length - 1]?.toLowerCase() === 'scripts'
+  const root = parent[parent.length - 1]?.toLowerCase() === 'scripts'
     ? parent.slice(0, -1).join('/')
     : parent.join('/');
+  return root === '' ? undefined : root;
 }
 
 export const ue4ssSpec = makeInstaller({
@@ -161,13 +173,13 @@ export const ue4ssSpec = makeInstaller({
   accept: containsUE4SSScripts,
   route: (files) => {
     const root = findUE4SSModRoot(files);
-    if (root === undefined || root === '') return [];
+    if (root === undefined) return [];
     const stripPrefix = dirname(root);
     const underRoot = (f: string): boolean => {
       const norm = toPosix(f);
       return norm === root || norm.startsWith(`${root}/`);
     };
-    return files.filter(underRoot).map((source) => {
+    return files.filter((f) => underRoot(f) && !isStrayMetadata(f)).map((source) => {
       const norm = toPosix(source);
       return { source, destination: stripPrefix === '' ? norm : norm.slice(stripPrefix.length + 1) };
     });

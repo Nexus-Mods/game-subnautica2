@@ -27,8 +27,15 @@ export function ue4ssInjectorPath(isXbox: boolean): string {
   return `${INSTALL_DIR}/Binaries/${resolveArchDir(isXbox)}`;
 }
 
+// UE4SS 3.x lays out the runtime tree as `Binaries/<arch>/ue4ss/...`, with the
+// injector DLLs one level up at `Binaries/<arch>/`. Anything addressed inside
+// the ue4ss runtime (settings.ini, Mods/, logs) should hang off this root.
+export function ue4ssRootPath(isXbox: boolean): string {
+  return `${ue4ssInjectorPath(isXbox)}/ue4ss`;
+}
+
 export function ue4ssModsPath(isXbox: boolean): string {
-  return `${ue4ssInjectorPath(isXbox)}/ue4ss/Mods`;
+  return `${ue4ssRootPath(isXbox)}/Mods`;
 }
 
 export function resolveGamePath(gamePath: string, rel: string, isXbox: boolean): string {
