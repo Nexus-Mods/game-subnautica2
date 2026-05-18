@@ -9,6 +9,7 @@ import {
   MOD_TYPE_ROOT,
   MOD_TYPE_UE4SS,
   MOD_TYPE_UE4SS_INJECTOR,
+  PAK_MODS_RELPATH,
 } from './constants';
 import { ue4ssInjectorPath, ue4ssModsPath } from './game';
 import {
@@ -180,6 +181,7 @@ const ROOT_TOP_LEVEL_DIRS = [INSTALL_DIR, 'Engine', 'Binaries'];
 export const rootSpec = makeInstaller({
   id: MOD_TYPE_ROOT,
   priority: 23,
+  modType: { name: 'Root (game folder)', destPath: '' },
   accept: (files) => ROOT_TOP_LEVEL_DIRS.some((dir) => files.some((f) => hasSegment(f, dir))),
   route: (files) => files.map((source) => ({ source, destination: source })),
 });
@@ -223,12 +225,11 @@ export const pakAltSpec = makeInstaller({
 });
 
 // --- Pak (default, flat into ~mods) (priority 30, lowest) ---
-//
-// No explicit modType: subnautica2-pak falls back to the game's queryModPath
-// (PAK_MODS_RELPATH).
+
 export const pakSpec = makeInstaller({
   id: MOD_TYPE_PAK,
   priority: 30,
+  modType: { name: 'Paks (~mods)', destPath: PAK_MODS_RELPATH },
   losesTo: LOSES_TO_HIGHER_PRIORITY,
   accept: (files) => findPakGroups(files).length > 0,
   route: (files) =>
