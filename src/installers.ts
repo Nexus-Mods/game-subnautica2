@@ -9,6 +9,7 @@ import {
   MOD_TYPE_ROOT,
   MOD_TYPE_UE4SS,
   MOD_TYPE_UE4SS_INJECTOR,
+  PAK_MODS_RELPATH,
 } from './constants';
 import { ue4ssInjectorPath, ue4ssModsPath } from './game';
 import {
@@ -136,8 +137,33 @@ export const logicModsSpec = makeInstaller({
 
 // --- UE4SS Lua scripts (priority 22) ---
 
-function isUE4SSScriptFile(file: string): boolean {
-  return basename(file).toLowerCase() === 'enabled.txt' || hasExt(file, 'lua');
+// OS-generated metadata files we never want to copy into the mod folder.
+const STRAY_METADATA_NAMES: readonly string[] = ['thumbs.db', '.ds_store', 'desktop.ini'];
+
+function isStrayMetadata(file: string): boolean {
+  return STRAY_METADATA_NAMES.includes(basename(file).toLowerCase());
+}
+
+// Locate the mod-root directory inside the archive by picking the shallowest
+// Lua-mod signal (`.lua` file or `enabled.txt`) and walking one level above a
+// `Scripts/` parent if present. Returns undefined when there is no marker, or
+// when the marker sits at the archive root with no mod folder to copy under.
+//
+// Limitation: a single archive that bundles multiple sibling mods (e.g.
+// `ModA/enabled.txt` + `ModB/enabled.txt`) yields only the first mod root by
+// sort order; files under any other sibling are silently dropped. No real-
+// world Nexus archives exhibit this layout today; revisit if that changes.
+function findUE4SSModRoot(files: readonly string[]): string | undefined {
+  const marker = files
+    .map(toPosix)
+    .filter((f) => hasExt(f, 'lua') || basename(f).toLowerCase() === 'enabled.txt')
+    .sort((a, b) => splitSegments(a).length - splitSegments(b).length)[0];
+  if (marker === undefined) return undefined;
+  const parent = splitSegments(dirname(marker));
+  const root = parent[parent.length - 1]?.toLowerCase() === 'scripts'
+    ? parent.slice(0, -1).join('/')
+    : parent.join('/');
+  return root === '' ? undefined : root;
 }
 
 export const ue4ssSpec = makeInstaller({
@@ -145,16 +171,19 @@ export const ue4ssSpec = makeInstaller({
   priority: 22,
   modType: { name: 'UE4SS (Lua scripts)', destPath: ue4ssModsPath },
   accept: containsUE4SSScripts,
-  route: (files) =>
-    files.filter(isUE4SSScriptFile).map((source) => {
-      const segs = splitSegments(source);
-      if (segs.length === 1) {
-        const only = segs[0]!;
-        const stem = only.replace(/\.[^.]+$/, '');
-        return { source, destination: `${stem}/${only}` };
-      }
-      return { source, destination: `${segs[0]}/${segs.slice(1).join('/')}` };
-    }),
+  route: (files) => {
+    const root = findUE4SSModRoot(files);
+    if (root === undefined) return [];
+    const stripPrefix = dirname(root);
+    const underRoot = (f: string): boolean => {
+      const norm = toPosix(f);
+      return norm === root || norm.startsWith(`${root}/`);
+    };
+    return files.filter((f) => underRoot(f) && !isStrayMetadata(f)).map((source) => {
+      const norm = toPosix(source);
+      return { source, destination: stripPrefix === '' ? norm : norm.slice(stripPrefix.length + 1) };
+    });
+  },
 });
 
 // --- Root (priority 23) ---
@@ -164,6 +193,7 @@ const ROOT_TOP_LEVEL_DIRS = [INSTALL_DIR, 'Engine', 'Binaries'];
 export const rootSpec = makeInstaller({
   id: MOD_TYPE_ROOT,
   priority: 23,
+  modType: { name: 'Root (game folder)', destPath: '' },
   accept: (files) => ROOT_TOP_LEVEL_DIRS.some((dir) => files.some((f) => hasSegment(f, dir))),
   route: (files) => files.map((source) => ({ source, destination: source })),
 });
@@ -207,12 +237,11 @@ export const pakAltSpec = makeInstaller({
 });
 
 // --- Pak (default, flat into ~mods) (priority 30, lowest) ---
-//
-// No explicit modType: subnautica2-pak falls back to the game's queryModPath
-// (PAK_MODS_RELPATH).
+
 export const pakSpec = makeInstaller({
   id: MOD_TYPE_PAK,
   priority: 30,
+  modType: { name: 'Paks (~mods)', destPath: PAK_MODS_RELPATH },
   losesTo: LOSES_TO_HIGHER_PRIORITY,
   accept: (files) => findPakGroups(files).length > 0,
   route: (files) =>

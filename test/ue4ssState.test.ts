@@ -2,7 +2,7 @@ import { beforeEach, vi, type Mock } from 'vitest';
 import { fs, selectors, types, util } from 'vortex-api';
 import {
   isThisGameActive,
-  openInjectorFile,
+  openUE4SSSettingsIni,
   openModsFile,
   openNexusPage,
   regenerateModsFile,
@@ -57,18 +57,26 @@ describe('isThisGameActive', () => {
   });
 });
 
-describe('openInjectorFile / openModsFile / openNexusPage', () => {
-  test('openInjectorFile opens the absolute path of a file in Binaries/<arch>', () => {
+describe('openUE4SSSettingsIni / openModsFile / openNexusPage', () => {
+  test('openUE4SSSettingsIni opens settings.ini under Binaries/<arch>/ue4ss', () => {
     mockedDiscovery.mockReturnValue({ path: '/games/Subnautica2', store: 'steam' });
-    openInjectorFile(asExtensionApi(makeApi()), 'UE4SS-settings.ini');
+    openUE4SSSettingsIni(asExtensionApi(makeApi()));
     expect(mockedOpn).toHaveBeenCalledWith(
-      '/games/Subnautica2/Subnautica2/Binaries/Win64/UE4SS-settings.ini',
+      '/games/Subnautica2/Subnautica2/Binaries/Win64/ue4ss/UE4SS-settings.ini',
     );
   });
 
-  test('openInjectorFile is a no-op when the game is not discovered', () => {
+  test('openUE4SSSettingsIni resolves the Xbox path correctly', () => {
+    mockedDiscovery.mockReturnValue({ path: '/xbox/Subnautica2', store: 'xbox' });
+    openUE4SSSettingsIni(asExtensionApi(makeApi()));
+    expect(mockedOpn).toHaveBeenCalledWith(
+      '/xbox/Subnautica2/Binaries/WinGDK/ue4ss/UE4SS-settings.ini',
+    );
+  });
+
+  test('openUE4SSSettingsIni is a no-op when the game is not discovered', () => {
     mockedDiscovery.mockReturnValue(undefined);
-    openInjectorFile(asExtensionApi(makeApi()), 'UE4SS-settings.ini');
+    openUE4SSSettingsIni(asExtensionApi(makeApi()));
     expect(mockedOpn).not.toHaveBeenCalled();
   });
 

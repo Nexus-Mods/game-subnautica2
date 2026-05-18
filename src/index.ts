@@ -8,7 +8,6 @@ import {
   NEXUS_ID,
   PAK_MODS_RELPATH,
   INSTALL_DIR,
-  UE4SS_SETTINGS_FILE,
   IGNORE_CONFLICTS,
   IGNORE_DEPLOY,
 } from './constants';
@@ -16,7 +15,7 @@ import { prepareForModding, IDiscovery } from './game';
 import { registerModTypes } from './modTypes';
 import {
   isThisGameActive,
-  openInjectorFile,
+  openUE4SSSettingsIni,
   openModsFile,
   openNexusPage,
   regenerateModsFile,
@@ -30,7 +29,7 @@ function findGame(): Bluebird<string> {
 }
 
 const TOOLBAR_ACTIONS: readonly { priority: number; title: string; run: (api: types.IExtensionApi) => void }[] = [
-  { priority: 200, title: 'Open UE4SS Settings INI', run: (api) => openInjectorFile(api, UE4SS_SETTINGS_FILE) },
+  { priority: 200, title: 'Open UE4SS Settings INI', run: openUE4SSSettingsIni },
   { priority: 201, title: 'Open UE4SS mods.txt', run: openModsFile },
   { priority: 202, title: 'Open Nexus Page', run: () => openNexusPage() },
 ];

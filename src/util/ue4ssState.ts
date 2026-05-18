@@ -2,8 +2,9 @@ import { fs, selectors, types, util } from 'vortex-api';
 import {
   GAME_ID,
   NEXUS_ID,
+  UE4SS_SETTINGS_FILE,
 } from '../constants';
-import { resolveGamePath, ue4ssInjectorPath, ue4ssModsPath } from '../game';
+import { resolveGamePath, ue4ssModsPath, ue4ssRootPath } from '../game';
 import type { RelPath } from '../installers';
 
 interface VortexDiscovery {
@@ -37,8 +38,8 @@ export function isThisGameActive(api: types.IExtensionApi): boolean {
   return getActiveGameId(api) === GAME_ID;
 }
 
-export function openInjectorFile(api: types.IExtensionApi, filename: string): void {
-  const target = gameAbsPath(api, (isXbox) => `${ue4ssInjectorPath(isXbox)}/${filename}`);
+export function openUE4SSSettingsIni(api: types.IExtensionApi): void {
+  const target = gameAbsPath(api, (isXbox) => `${ue4ssRootPath(isXbox)}/${UE4SS_SETTINGS_FILE}`);
   if (target !== undefined) opn(target);
 }
 

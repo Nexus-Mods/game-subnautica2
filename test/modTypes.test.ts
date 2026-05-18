@@ -2,12 +2,14 @@ import { isTypeMatch } from '../src/modTypes';
 import {
   MOD_TYPE_CONTENT_FOLDER,
   MOD_TYPE_LOGICMODS,
+  MOD_TYPE_PAK,
   MOD_TYPE_PAK_ALT,
   MOD_TYPE_ROOT,
   MOD_TYPE_UE4SS,
   MOD_TYPE_UE4SS_INJECTOR,
 } from '../src/constants';
-import type { IInstruction } from '../src/installers';
+import { resolveGamePath } from '../src/game';
+import { MOD_SPECS, type IInstruction } from '../src/installers';
 
 describe('isTypeMatch', () => {
   test('returns true when a setmodtype instruction has the queried type', () => {
@@ -43,8 +45,32 @@ describe('isTypeMatch', () => {
   test.each([
     [MOD_TYPE_ROOT, 'subnautica2-root'],
     [MOD_TYPE_CONTENT_FOLDER, 'subnautica2-contentfolder'],
+    [MOD_TYPE_PAK, 'subnautica2-pak'],
     [MOD_TYPE_PAK_ALT, 'subnautica2-pakalt'],
   ])('matches the %s setmodtype value', (typeId, _expected) => {
     expect(isTypeMatch(typeId, [{ type: 'setmodtype', value: typeId }])).toBe(true);
+  });
+});
+
+describe('MOD_SPECS modType registration invariant', () => {
+  // Every installer emits { type: 'setmodtype', value: spec.id } via
+  // makeInstaller. If a spec lacks a modType, registerModTypes skips it,
+  // leaving Vortex with no destPath for that type — files get tagged with
+  // an unregistered type and the deployment silently no-ops.
+  test.each(MOD_SPECS.map((s) => [s.id, s] as const))(
+    '%s has a modType so it gets registered',
+    (_id, spec) => {
+      expect(spec.modType).toBeDefined();
+    },
+  );
+
+  test('MOD_TYPE_ROOT deploys to the game folder itself', () => {
+    const spec = MOD_SPECS.find((s) => s.id === MOD_TYPE_ROOT);
+    expect(spec?.modType).toBeDefined();
+    const destPath = spec!.modType!.destPath;
+    const rel = typeof destPath === 'function' ? destPath(false) : destPath;
+    expect(rel).toBe('');
+    expect(resolveGamePath('/games/Subnautica2', rel, false)).toBe('/games/Subnautica2');
+    expect(resolveGamePath('/xbox/Subnautica2', rel, true)).toBe('/xbox/Subnautica2');
   });
 });
