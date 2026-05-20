@@ -97,6 +97,37 @@ function isInjectorMarker(file: string): boolean {
   return (UE4SS_INJECTOR_MARKERS as readonly string[]).includes(name);
 }
 
+// --- LogicMods (priority 20) ---
+
+export const logicModsSpec = makeInstaller({
+  id: MOD_TYPE_LOGICMODS,
+  priority: 20,
+  modType: { name: 'LogicMods (Blueprint paks)', destPath: LOGIC_MODS_RELPATH },
+  accept: containsLogicMods,
+  route: (files) =>
+    files
+      .filter((f) => hasAnyExt(f, PAK_EXTENSIONS))
+      .map((source) => {
+        const tail = pathAfterSegment(source, 'logicmods');
+        return tail === null ? null : { source, destination: tail };
+      })
+      .filter((c): c is { source: string; destination: string } => c !== null),
+});
+
+// --- Pak (default, flat into ~mods) (priority 21) ---
+
+export const pakSpec = makeInstaller({
+  id: MOD_TYPE_PAK,
+  priority: 21, // Intercepts early before contentFolderSpec (25) or pakAltSpec (27) can hijack deployment
+  modType: { name: 'Paks (~mods)', destPath: PAK_MODS_RELPATH },
+  losesTo: LOSES_TO_HIGHER_PRIORITY,
+  accept: (files) => findPakGroups(files).length > 0,
+  route: (files) =>
+    findPakGroups(files).flatMap((g) =>
+      g.files.map((source) => ({ source, destination: basename(source) })),
+    ),
+});
+
 function findInjectorMarker(entries: readonly string[]): string | undefined {
   return entries.filter(isInjectorMarker).sort((a, b) => splitSegments(a).length - splitSegments(b).length)[0];
 }
@@ -118,52 +149,12 @@ export const ue4ssInjectorSpec = makeInstaller({
   },
 });
 
-// --- LogicMods (priority 20) ---
-
-export const logicModsSpec = makeInstaller({
-  id: MOD_TYPE_LOGICMODS,
-  priority: 20,
-  modType: { name: 'LogicMods (Blueprint paks)', destPath: LOGIC_MODS_RELPATH },
-  accept: containsLogicMods,
-  route: (files) =>
-    files
-      .filter((f) => hasAnyExt(f, PAK_EXTENSIONS))
-      .map((source) => {
-        const tail = pathAfterSegment(source, 'logicmods');
-        return tail === null ? null : { source, destination: tail };
-      })
-      .filter((c): c is { source: string; destination: string } => c !== null),
-});
-
 // --- UE4SS Lua scripts (priority 22) ---
 
-// OS-generated metadata files we never want to copy into the mod folder.
 const STRAY_METADATA_NAMES: readonly string[] = ['thumbs.db', '.ds_store', 'desktop.ini'];
 
 function isStrayMetadata(file: string): boolean {
   return STRAY_METADATA_NAMES.includes(basename(file).toLowerCase());
-}
-
-// Locate the mod-root directory inside the archive by picking the shallowest
-// Lua-mod signal (`.lua` file or `enabled.txt`) and walking one level above a
-// `Scripts/` parent if present. Returns undefined when there is no marker, or
-// when the marker sits at the archive root with no mod folder to copy under.
-//
-// Limitation: a single archive that bundles multiple sibling mods (e.g.
-// `ModA/enabled.txt` + `ModB/enabled.txt`) yields only the first mod root by
-// sort order; files under any other sibling are silently dropped. No real-
-// world Nexus archives exhibit this layout today; revisit if that changes.
-function findUE4SSModRoot(files: readonly string[]): string | undefined {
-  const marker = files
-    .map(toPosix)
-    .filter((f) => hasExt(f, 'lua') || basename(f).toLowerCase() === 'enabled.txt')
-    .sort((a, b) => splitSegments(a).length - splitSegments(b).length)[0];
-  if (marker === undefined) return undefined;
-  const parent = splitSegments(dirname(marker));
-  const root = parent[parent.length - 1]?.toLowerCase() === 'scripts'
-    ? parent.slice(0, -1).join('/')
-    : parent.join('/');
-  return root === '' ? undefined : root;
 }
 
 export const ue4ssSpec = makeInstaller({
@@ -172,17 +163,31 @@ export const ue4ssSpec = makeInstaller({
   modType: { name: 'UE4SS (Lua scripts)', destPath: ue4ssModsPath },
   accept: containsUE4SSScripts,
   route: (files) => {
-    const root = findUE4SSModRoot(files);
-    if (root === undefined) return [];
-    const stripPrefix = dirname(root);
-    const underRoot = (f: string): boolean => {
-      const norm = toPosix(f);
-      return norm === root || norm.startsWith(`${root}/`);
-    };
-    return files.filter((f) => underRoot(f) && !isStrayMetadata(f)).map((source) => {
-      const norm = toPosix(source);
-      return { source, destination: stripPrefix === '' ? norm : norm.slice(stripPrefix.length + 1) };
-    });
+    const marker = files
+      .map(toPosix)
+      .filter((f) => hasExt(f, 'lua') || basename(f).toLowerCase() === 'enabled.txt')
+      .sort((a, b) => splitSegments(a).length - splitSegments(b).length)[0];
+
+    if (marker === undefined) return [];
+
+    const parentSegments = splitSegments(dirname(marker));
+    const rootPath = parentSegments[parentSegments.length - 1]?.toLowerCase() === 'scripts'
+      ? parentSegments.slice(0, -1).join('/')
+      : parentSegments.join('/');
+
+    // Account for flat archive layouts cleanly
+    const s = rootPath === '' ? '' : dirname(rootPath);
+
+    // Removed substring bounding restriction so sibling folders (.png assets) migrate together
+    return files
+      .filter((f) => !isStrayMetadata(f))
+      .map((source) => {
+        const posix = toPosix(source);
+        return {
+          source,
+          destination: s === '' ? posix : posix.slice(s.length + 1),
+        };
+      });
   },
 });
 
@@ -236,29 +241,15 @@ export const pakAltSpec = makeInstaller({
       .filter((c): c is { source: string; destination: string } => c !== null),
 });
 
-// --- Pak (default, flat into ~mods) (priority 30, lowest) ---
-
-export const pakSpec = makeInstaller({
-  id: MOD_TYPE_PAK,
-  priority: 30,
-  modType: { name: 'Paks (~mods)', destPath: PAK_MODS_RELPATH },
-  losesTo: LOSES_TO_HIGHER_PRIORITY,
-  accept: (files) => findPakGroups(files).length > 0,
-  route: (files) =>
-    findPakGroups(files).flatMap((g) =>
-      g.files.map((source) => ({ source, destination: basename(source) })),
-    ),
-});
-
 // Ordered by installer priority — Vortex evaluates lowest first.
 export const MOD_SPECS: readonly ModSpec[] = [
   ue4ssInjectorSpec,
   logicModsSpec,
+  pakSpec,
   ue4ssSpec,
   rootSpec,
   contentFolderSpec,
   pakAltSpec,
-  pakSpec,
 ];
 
 // Per-installer test/install re-exports for test files.
