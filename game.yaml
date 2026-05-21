@@ -15,16 +15,29 @@ stores:
 
 context:
   installDir: Subnautica2
-  paksRoot:   ${installPath}/Subnautica2/Content/Paks/~mods
-  logicRoot:  ${installPath}/Subnautica2/Content/Paks/LogicMods
-  ue4ssRoot:  ${installPath}/Subnautica2/Binaries/Win64/ue4ss/Mods
+  paksRoot:           ${installPath}/Subnautica2/Content/Paks/~mods
+  logicRoot:          ${installPath}/Subnautica2/Content/Paks/LogicMods
+  ue4ssRoot:          ${installPath}/Subnautica2/Binaries/Win64/ue4ss/Mods
+  ue4ssInjectorRoot: !storeBranch
+    xbox:    ${installPath}/Subnautica2/Binaries/WinGDK
+    default: ${installPath}/Subnautica2/Binaries/Win64
 
 modTypes:
-  - { id: pak,       name: "Paks (~mods)",              path: "${paksRoot}" }
-  - { id: logic-mod, name: "LogicMods (Blueprint paks)", path: "${logicRoot}" }
-  - { id: ue4ss-lua, name: "UE4SS (Lua scripts)",        path: "${ue4ssRoot}" }
+  - { id: pak,            name: "Paks (~mods)",               path: "${paksRoot}" }
+  - { id: logic-mod,      name: "LogicMods (Blueprint paks)", path: "${logicRoot}" }
+  - { id: ue4ss-lua,      name: "UE4SS (Lua scripts)",        path: "${ue4ssRoot}" }
+  - { id: ue4ss-injector, name: "UE4SS Injector",             path: "${ue4ssInjectorRoot}" }
+  - { id: root,           name: "Root (game folder)",         path: "${installPath}" }
 
 installers:
+  - id: ue4ss-injector
+    priority: 15
+    when:    !hasFile "**/{dwmapi.dll,xinput1_4.dll,ue4ss-settings.ini}"
+    anchor:  "**/{dwmapi.dll,xinput1_4.dll,ue4ss-settings.ini}"
+    take:    parent
+    placeAt: "${ue4ssInjectorRoot}"
+    modType: ue4ss-injector
+
   - id: logic-mod
     priority: 20
     when:    !hasFile "**/LogicMods/**/*.pak"
@@ -35,23 +48,61 @@ installers:
 
   - id: ue4ss-lua
     priority: 22
-    when: !any
-      - !hasFile "**/Scripts/*.lua"
-      - !hasFile "**/enabled.txt"
-    anchor:  "**/Scripts/"
-    take:    parent
+    when:    !hasFile "**/Scripts/*.lua"
+    anchor:  "**/Scripts/*.lua"
+    take:    parent.parent
+    placeAt: "${ue4ssRoot}"
+    modType: ue4ss-lua
+
+  - id: ue4ss-lua-enabled
+    priority: 23
+    when:    !hasFile "**/enabled.txt"
+    unless:  !hasFile "**/Scripts/*.lua"
+    anchor:  "**/enabled.txt"
+    take:    parent.parent
     placeAt: "${ue4ssRoot}"
     modType: ue4ss-lua
 
   - id: pak
     priority: 30
     when:    !hasFile "**/*.pak"
+    unless: !any
+      - !hasFile "**/LogicMods/**"
+      - !hasFile "**/Scripts/*.lua"
+      - !hasFile "**/{dwmapi.dll,xinput1_4.dll,ue4ss-settings.ini}"
+      - !hasFile "**/Subnautica2/**"
+      - !hasFile "**/Engine/**"
+      - !hasFile "**/Binaries/**"
     anchor:  "**/*.pak"
     take:    parent
     placeAt: "${paksRoot}"
     modType: pak
 
+  - id: root
+    priority: 40
+    when: !any
+      - !hasFile "**/Subnautica2/**"
+      - !hasFile "**/Engine/**"
+      - !hasFile "**/Binaries/**"
+    unless: !any
+      - !hasFile "**/LogicMods/**"
+      - !hasFile "**/Scripts/*.lua"
+      - !hasFile "**/{dwmapi.dll,xinput1_4.dll,ue4ss-settings.ini}"
+    anchor:  "**/*"
+    take:    archive-root
+    placeAt: "${installPath}"
+    modType: root
+
 discovery: {}
+
+setup:
+  ensureDirs:
+    - ${paksRoot}
+    - ${logicRoot}
+    - ${ue4ssRoot}
+
+events:
+  did-deploy: !hook regenerateModsTxt
 
 nexus:
   modId: 1234              # PLACEHOLDER — replace with the real subnautica2 mod-page id when known
@@ -77,13 +128,37 @@ tests:
         matched: logic-mod
         modType: logic-mod
 
-    - name: typical ue4ss lua mod
+    - name: ue4ss lua with Scripts preserves mod-name in destination
       archive:
         - MyLuaMod/Scripts/main.lua
         - MyLuaMod/Scripts/util.lua
       expect:
         matched: ue4ss-lua
         modType: ue4ss-lua
+
+    - name: enabled.txt-only ue4ss mod
+      archive:
+        - MyLuaMod/enabled.txt
+        - MyLuaMod/data.json
+      expect:
+        matched: ue4ss-lua-enabled
+        modType: ue4ss-lua
+
+    - name: ue4ss injector mod
+      archive:
+        - Pack/inject/dwmapi.dll
+        - Pack/inject/ue4ss/Mods/keep
+      expect:
+        matched: ue4ss-injector
+        modType: ue4ss-injector
+
+    - name: root archive — whole game folder
+      archive:
+        - Subnautica2/Content/Paks/foo.pak
+        - Engine/Content/bar.uasset
+      expect:
+        matched: root
+        modType: root
 
 toolbarActions:
   - id: open-ue4ss-settings
