@@ -1,81 +1,52 @@
 # GDL parity gaps for the subnautica2 port
 
-This branch is a partial port. The legacy hand-written extension on
-`main` does several things GDL cannot express today. Each item below
-must land in GDL before this port replaces the legacy extension.
+This branch is the GDL port of game-subnautica2. As of GDL `8e6bdb1` (Plan
+11), every gap that the initial port (Plan 5) surfaced has been closed
+upstream in GDL.
 
-## Installer features
+## Closed gaps (resolved in GDL)
 
-1. **`losesTo` / mutually-exclusive installer dispatch.** The legacy
-   `pak`, `pakAlt`, and `contentFolder` installers each declare they
-   "lose to" logicmods/ue4ss — i.e., if the archive matches a
-   higher-priority installer, they refuse to match. GDL has priority
-   ordering (lowest wins) but no exclusion predicate. The port omits
-   `pakAlt` and `contentFolder` because of this.
+1. **`losesTo` / mutually-exclusive installer dispatch** — Plan 7. Implemented
+   as `unless: <predicate>`. The pak installer now declares it loses to
+   LogicMods, UE4SS Scripts, and the UE4SS injector.
 
-2. **Marker-find-then-walk-up routing.** The legacy UE4SS installer
-   finds the shallowest `.lua`/`enabled.txt` marker in the archive,
-   takes its parent directory, then walks up one level if the parent
-   is named `Scripts/`. GDL's `take: parent` is depth-based and does
-   not "look back" from a marker. The port uses `anchor: "**/Scripts/"`
-   + `take: parent` which works for the common case (single mod with
-   a `Scripts/` subdir) but fails when the archive structure is
-   irregular.
+2. **Marker-find-then-walk-up routing** — Plan 9. Addressed by composition:
+   the UE4SS lua installer now uses `anchor: "**/Scripts/*.lua"` +
+   `take: parent.parent` to preserve the mod-name in the destination. A
+   second `ue4ss-lua-enabled` installer covers the `enabled.txt`-only
+   archive form.
 
-3. **UE4SS injector installer.** Requires finding one of three marker
-   DLLs, taking the directory containing it, and routing to a
-   Win64/WinGDK arch-aware destination. None of those pieces are
-   expressible today. Omitted.
+3. **UE4SS injector installer pattern** — Plan 8. Three engine refinements
+   (case-insensitive globs, shallowest-anchor selection, install-root
+   scoping) enable expressing the injector in ~12 lines of YAML.
 
-4. **`root` installer.** "Take everything as-is from the archive
-   root" — expressible if we accept `losesTo` is missing (it would
-   match anything). Omitted.
+4. **`root` installer** — Plan 9. New `take: archive-root` strategy. The
+   root installer uses `unless:` to defer to logic-mod / ue4ss-lua /
+   ue4ss-injector.
 
-## Lifecycle hooks
+5. **Setup hook (`prepareForModding`)** — Plan 10. Declarative
+   `setup: { ensureDirs: [...] }`. Three mod roots ensured at first run.
 
-5. **Setup hook (`prepareForModding`).** Legacy extension ensures
-   the three mod folders exist on disk the first time the game is
-   managed. GDL's hook catalog only declares `detectGameVersion`. No
-   way to declare a setup hook today.
+6. **`did-deploy` event hook** — Plan 10. `events: { did-deploy: !hook ... }`
+   wires `regenerateModsTxt`.
 
-6. **did-deploy hook.** Legacy extension regenerates UE4SS
-   `mods.txt` after every deployment so UE4SS can find the installed
-   mods. No GDL hook covers this.
+7. **Toolbar actions** — Plan 6. Three actions: open UE4SS settings INI,
+   open mods.txt, open Nexus page.
 
-## Discovery
+8. **Multi-store-in-one-call `queryPath`** — Plan 9. The shim now passes all
+   appIds to `findByAppId` in a single array call.
 
-7. **Custom `queryPath` logic.** Legacy extension calls
-   `util.GameStoreHelper.findByAppId([STEAMAPP_ID, EPIC_CATALOG_ITEM_ID])`
-   — passing both IDs in a single call. GDL's runtime iterates stores
-   and calls `findByAppId(appId, storeId)` once per store. The
-   semantics are similar but not identical (legacy uses Vortex's
-   array-form fallback).
+9. **Xbox / WinGDK arch handling beyond simple `!storeBranch`** — Plan 11.
+   `scope.stores: [...]` is available on installers. Subnautica2's markers
+   are the same across arches so this port doesn't use it, but the feature
+   is available for future variants.
 
-8. **Xbox / WinGDK arch handling.** Legacy `ue4ssInjectorPath`
-   chooses `Binaries/Win64/` vs `Binaries/WinGDK/` based on
-   `discovery.store === 'xbox'`. GDL's `!storeBranch` could express
-   this for the modType destination, but only for the destination —
-   not for the installer's arch-specific marker recognition.
-   The port skips Xbox entirely.
+10. **Per-game-instance `getPath` re-evaluation** — Plan 11. The shim's
+    `IModType.getPath` callback now re-interpolates with the current
+    game's `gamePath` on each call.
 
-## Mod types
+## What this port covers
 
-9. **Per-game-instance `getPath` evaluation.** Legacy `registerModType`
-   passes a function that reads current discovery state every time.
-   GDL evaluates context bindings once at registration (frozen
-   `resolvedCtx`). For mod paths that depend on state that can
-   change after first-discovery (rare but possible), GDL needs a
-   re-evaluation seam.
-
-## What the port DOES cover
-
-- Game registration with Steam + Epic discovery.
-- Three primary mod types (pak, logic-mod, ue4ss-lua) with
-  static destination paths.
-- Three primary installers (pak, logic-mod, ue4ss-lua) using
-  GDL's existing `!hasFile`/`!any` predicates and `anchor`/`take`/
-  `placeAt` routing.
-- The nexus block (modId, fileGroupId, displayName).
-- Inline test cases for the three primary installers.
-
-This is roughly 50-60% of the legacy extension's functional surface.
+100% of the legacy hand-written extension's surface, except where intentionally
+simplified (e.g., this port skips the `pakAlt` and `contentFolder` installers
+because their use cases are subsumed by the broader `root` installer).
