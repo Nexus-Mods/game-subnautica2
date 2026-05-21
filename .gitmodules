@@ -1,0 +1,4 @@
+[submodule "gdl"]
+	path = gdl
+	url = https://github.com/Nexus-Mods/game-description-language
+	branch = gdl-mvp
