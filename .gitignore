@@ -1,9 +1,11 @@
 node_modules/
 dist/
 out/
+.gdl-out/
 info.json
 *.7z
 *.log
 .DS_Store
 coverage/
 .eslintcache
+pnpm-workspace.yaml
