@@ -8,6 +8,7 @@ game:
     - Subnautica2.exe
   logo: gameart.webp
   contributedBy: tbaldridge
+  nexusDomain: subnautica2
 
 stores:
   steam: 1962700
