@@ -1,0 +1,86 @@
+gdl: 1
+
+game:
+  id: subnautica2
+  name: Subnautica 2
+  executable: Subnautica2.exe
+  requiredFiles:
+    - Subnautica2.exe
+  logo: gameart.webp
+  contributedBy: tbaldridge
+
+stores:
+  steam: 1962700
+  epic:  22bfc34d90b64054809542014fc9eb32
+
+context:
+  installDir: Subnautica2
+  paksRoot:   ${installPath}/Subnautica2/Content/Paks/~mods
+  logicRoot:  ${installPath}/Subnautica2/Content/Paks/LogicMods
+  ue4ssRoot:  ${installPath}/Subnautica2/Binaries/Win64/ue4ss/Mods
+
+modTypes:
+  - { id: pak,       name: "Paks (~mods)",              path: "${paksRoot}" }
+  - { id: logic-mod, name: "LogicMods (Blueprint paks)", path: "${logicRoot}" }
+  - { id: ue4ss-lua, name: "UE4SS (Lua scripts)",        path: "${ue4ssRoot}" }
+
+installers:
+  - id: logic-mod
+    priority: 20
+    when:    !hasFile "**/LogicMods/**/*.pak"
+    anchor:  "**/LogicMods/"
+    take:    self
+    placeAt: "${logicRoot}"
+    modType: logic-mod
+
+  - id: ue4ss-lua
+    priority: 22
+    when: !any
+      - !hasFile "**/Scripts/*.lua"
+      - !hasFile "**/enabled.txt"
+    anchor:  "**/Scripts/"
+    take:    parent
+    placeAt: "${ue4ssRoot}"
+    modType: ue4ss-lua
+
+  - id: pak
+    priority: 30
+    when:    !hasFile "**/*.pak"
+    anchor:  "**/*.pak"
+    take:    parent
+    placeAt: "${paksRoot}"
+    modType: pak
+
+discovery: {}
+
+nexus:
+  modId: 1234              # PLACEHOLDER — replace with the real subnautica2 mod-page id when known
+  fileGroupId: 7418978     # PLACEHOLDER — matches the existing legacy CI's file_group_id
+  displayName: Subnautica 2 Support for Vortex
+
+tests:
+  corpus: nexus
+  cases:
+    - name: typical pak mod
+      archive:
+        - MyMod/CoolPak.pak
+        - MyMod/Readme.md
+      expect:
+        matched: pak
+        modType: pak
+
+    - name: typical logic-mod
+      archive:
+        - SomePack/LogicMods/BPFolder/X.pak
+        - SomePack/LogicMods/Y.pak
+      expect:
+        matched: logic-mod
+        modType: logic-mod
+
+    - name: typical ue4ss lua mod
+      archive:
+        - MyLuaMod/Scripts/main.lua
+        - MyLuaMod/Scripts/util.lua
+      expect:
+        matched: ue4ss-lua
+        modType: ue4ss-lua
