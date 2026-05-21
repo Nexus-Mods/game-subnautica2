@@ -42,22 +42,16 @@ must land in GDL before this port replaces the legacy extension.
    `mods.txt` after every deployment so UE4SS can find the installed
    mods. No GDL hook covers this.
 
-## UI
-
-7. **Toolbar actions.** Legacy extension adds three actions to the
-   mod-list panel (Open UE4SS Settings INI, Open mods.txt, Open
-   Nexus Page). GDL does not register UI actions.
-
 ## Discovery
 
-8. **Custom `queryPath` logic.** Legacy extension calls
+7. **Custom `queryPath` logic.** Legacy extension calls
    `util.GameStoreHelper.findByAppId([STEAMAPP_ID, EPIC_CATALOG_ITEM_ID])`
    — passing both IDs in a single call. GDL's runtime iterates stores
    and calls `findByAppId(appId, storeId)` once per store. The
    semantics are similar but not identical (legacy uses Vortex's
    array-form fallback).
 
-9. **Xbox / WinGDK arch handling.** Legacy `ue4ssInjectorPath`
+8. **Xbox / WinGDK arch handling.** Legacy `ue4ssInjectorPath`
    chooses `Binaries/Win64/` vs `Binaries/WinGDK/` based on
    `discovery.store === 'xbox'`. GDL's `!storeBranch` could express
    this for the modType destination, but only for the destination —
@@ -66,12 +60,12 @@ must land in GDL before this port replaces the legacy extension.
 
 ## Mod types
 
-10. **Per-game-instance `getPath` evaluation.** Legacy `registerModType`
-    passes a function that reads current discovery state every time.
-    GDL evaluates context bindings once at registration (frozen
-    `resolvedCtx`). For mod paths that depend on state that can
-    change after first-discovery (rare but possible), GDL needs a
-    re-evaluation seam.
+9. **Per-game-instance `getPath` evaluation.** Legacy `registerModType`
+   passes a function that reads current discovery state every time.
+   GDL evaluates context bindings once at registration (frozen
+   `resolvedCtx`). For mod paths that depend on state that can
+   change after first-discovery (rare but possible), GDL needs a
+   re-evaluation seam.
 
 ## What the port DOES cover
 
