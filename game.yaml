@@ -84,3 +84,19 @@ tests:
       expect:
         matched: ue4ss-lua
         modType: ue4ss-lua
+
+toolbarActions:
+  - id: open-ue4ss-settings
+    title: Open UE4SS Settings INI
+    priority: 200
+    target: !openFile "${ue4ssRoot}/../UE4SS-settings.ini"
+
+  - id: open-mods-txt
+    title: Open UE4SS mods.txt
+    priority: 201
+    target: !openFile "${ue4ssRoot}/mods.txt"
+
+  - id: open-nexus-page
+    title: Open Nexus Page
+    priority: 202
+    target: !openUrl https://www.nexusmods.com/subnautica2
