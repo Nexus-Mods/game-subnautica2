@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.1.0 — 2026-05-26
+
+### Breaking
+
+- **Rewritten with GDL** — The entire extension is now declared in `game.yaml` using [Game Description Language](https://github.com/Nexus-Mods/game-description-language). All hand-coded TypeScript installer/routing logic has been replaced by declarative YAML rules. The only remaining custom code is `src/hooks.ts` for `regenerateModsTxt`.
+
+### New
+
+- **Bare Lua mod support** — Added `ue4ss-lua-bare` installer for UE4SS mods that place `.lua` files directly in the mod folder without a `Scripts/` subdirectory (e.g., FishSizeRandomizer).
+- **IO Store only installer** — Dedicated `pak-iostore` installer for mods with `.utoc` + `.ucas` files but no `.pak`.
+- **Corpus testing** — Installer rules are validated against real mod archives from NexusMods (17/17 validators pass, 21/24 archives matched).
+- **Inline test cases** — 24 test cases defined in `game.yaml` covering all installer routing scenarios.
+
+### Improvements
+
+- Reduced codebase from ~1,900 lines of TypeScript to ~500 lines of YAML + 63 lines of hooks.
+- Build pipeline simplified: `gdl build` replaces custom webpack config.
+- CI workflow updated for GDL-based build.
+
 ## 1.0.2 — 2026-05-18
 
 ### Bug Fixes
