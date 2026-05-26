@@ -99,6 +99,7 @@ installers:
       any:
         - { hasFile: "**/Scripts/*.lua" }
         - { hasFile: "**/enabled.txt" }
+        - { hasFile: "**/*.pak" }
         - { hasFile: "**/{dwmapi.dll,xinput1_4.dll,UE4SS-settings.ini}" }
     anchor: "**/*.lua"
     take: parent.parent
@@ -118,7 +119,6 @@ installers:
         - { hasFile: "**/LogicMods/**" }
         - { hasFile: "**/Scripts/*.lua" }
         - { hasFile: "**/enabled.txt" }
-        - { hasFile: "**/*.lua" }
         - { hasFile: "**/{dwmapi.dll,xinput1_4.dll,UE4SS-settings.ini}" }
     anchor: "**/*"
     take: archive-root
@@ -137,7 +137,6 @@ installers:
         - { hasFile: "**/LogicMods/**" }
         - { hasFile: "**/Scripts/*.lua" }
         - { hasFile: "**/enabled.txt" }
-        - { hasFile: "**/*.lua" }
     anchor: "**/*"
     take: archive-root
     placeAt: "${gamePath}"
@@ -225,7 +224,7 @@ toolbarActions:
 
 nexus:
   modId: 1091
-  fileGroupId: 29849
+  fileGroupId: 7418978
   displayName: Subnautica 2 Support for Vortex
 
 tests:
