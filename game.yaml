@@ -90,9 +90,24 @@ installers:
     placeAt: "${ue4ssModsPath}"
     modType: subnautica2-ue4ss
 
-  # --- Priority 24: Root (Subnautica2/, Engine/, or Binaries/ segments) ---
-  - id: root
+  # --- Priority 24: UE4SS Lua (bare .lua files, no Scripts/ directory) ---
+  # Some mods put .lua files directly in the mod folder without a Scripts/ subdirectory.
+  - id: ue4ss-lua-bare
     priority: 24
+    when: { hasFile: "**/*.lua" }
+    unless:
+      any:
+        - { hasFile: "**/Scripts/*.lua" }
+        - { hasFile: "**/enabled.txt" }
+        - { hasFile: "**/{dwmapi.dll,xinput1_4.dll,UE4SS-settings.ini}" }
+    anchor: "**/*.lua"
+    take: parent.parent
+    placeAt: "${ue4ssModsPath}"
+    modType: subnautica2-ue4ss
+
+  # --- Priority 25: Root (Subnautica2/, Engine/, or Binaries/ segments) ---
+  - id: root
+    priority: 25
     when:
       any:
         - { hasFile: "**/Subnautica2/**" }
@@ -103,15 +118,16 @@ installers:
         - { hasFile: "**/LogicMods/**" }
         - { hasFile: "**/Scripts/*.lua" }
         - { hasFile: "**/enabled.txt" }
+        - { hasFile: "**/*.lua" }
         - { hasFile: "**/{dwmapi.dll,xinput1_4.dll,UE4SS-settings.ini}" }
     anchor: "**/*"
     take: archive-root
     placeAt: "${installPath}"
     modType: subnautica2-root
 
-  # --- Priority 25: Content folder (Content/ or Config/ at archive root) ---
+  # --- Priority 26: Content folder (Content/ or Config/ at archive root) ---
   - id: content-folder
-    priority: 25
+    priority: 26
     when:
       any:
         - { hasFile: "Content/**" }
@@ -121,14 +137,15 @@ installers:
         - { hasFile: "**/LogicMods/**" }
         - { hasFile: "**/Scripts/*.lua" }
         - { hasFile: "**/enabled.txt" }
+        - { hasFile: "**/*.lua" }
     anchor: "**/*"
     take: archive-root
     placeAt: "${gamePath}"
     modType: subnautica2-contentfolder
 
-  # --- Priority 27: Pak alt (Paks/ folder without ~mods) ---
+  # --- Priority 28: Pak alt (Paks/ folder without ~mods) ---
   - id: pak-alt
-    priority: 27
+    priority: 28
     when:
       all:
         - { hasFile: "**/*.pak" }
@@ -331,6 +348,20 @@ tests:
         plan:
           - ${ue4ssModsPath}/MyLuaMod/enabled.txt
           - ${ue4ssModsPath}/MyLuaMod/data.json
+
+    # --- UE4SS Lua (bare .lua) ---
+    - name: "ue4ss-bare: lua files without Scripts/ directory"
+      archive:
+        - FishMod/main.lua
+        - FishMod/config.lua
+        - FishMod/physics.lua
+      expect:
+        matched: ue4ss-lua-bare
+        modType: subnautica2-ue4ss
+        plan:
+          - ${ue4ssModsPath}/FishMod/main.lua
+          - ${ue4ssModsPath}/FishMod/config.lua
+          - ${ue4ssModsPath}/FishMod/physics.lua
 
     # --- Root ---
     - name: "root: Subnautica2 + Engine segments"
