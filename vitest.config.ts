@@ -1,16 +1,18 @@
 import { defineConfig } from 'vitest/config';
-import path from 'node:path';
+import { resolve } from 'node:path';
 
 export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['test/**/*.test.ts'],
-    clearMocks: true,
-  },
-  resolve: {
+    include: [
+      '.gdl-out/tests.gen.ts',
+      'test/**/*.test.ts',
+    ],
     alias: {
-      'vortex-api': path.resolve(__dirname, 'test/__mocks__/vortex-api.ts'),
+      'vortex-api': resolve(__dirname, 'test/__mocks__/vortex-api.ts'),
+      '@gdl/runtime': resolve(__dirname, 'gdl/src/runtime/index.ts'),
     },
+    restoreMocks: true,
   },
 });
