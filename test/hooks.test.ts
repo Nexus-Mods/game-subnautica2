@@ -1,6 +1,12 @@
+import { readFile } from 'node:fs/promises';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fs, selectors } from 'vortex-api';
-import { listModDirs, regenerateModsTxt } from '../src/hooks';
+import { detectGameVersion, listModDirs, regenerateModsTxt } from '../src/hooks';
+
+vi.mock('node:fs/promises', () => ({
+  readFile: vi.fn(),
+}));
+const mockReadFile = vi.mocked(readFile);
 
 const mockActiveGameId = vi.mocked(selectors.activeGameId);
 const mockDiscoveryByGame = vi.mocked(selectors.discoveryByGame);
@@ -16,6 +22,43 @@ const fakeApi = (activeId: string, gamePath?: string, store?: string) => ({
       gamePath ? { path: gamePath, store } : undefined,
     );
   },
+});
+
+function utf16le(text: string): Buffer {
+  const bom = Buffer.from([0xff, 0xfe]);
+  const body = Buffer.from(text, 'utf16le');
+  return Buffer.concat([bom, body]);
+}
+
+describe('detectGameVersion', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('returns build_number.changelist from UTF-16LE version.json', async () => {
+    const json = JSON.stringify({ build_number: 63, changelist: 114707, branch: '//test' });
+    mockReadFile.mockResolvedValue(utf16le(json));
+
+    const v = await detectGameVersion({ installPath: '/games/SN2' });
+
+    expect(v).toBe('63.114707');
+    expect(mockReadFile).toHaveBeenCalledWith('/games/SN2/version.json');
+  });
+
+  it('returns null when version.json is missing', async () => {
+    mockReadFile.mockRejectedValue(new Error('ENOENT'));
+
+    const v = await detectGameVersion({ installPath: '/games/SN2' });
+
+    expect(v).toBeNull();
+  });
+
+  it('returns null when JSON lacks expected fields', async () => {
+    const json = JSON.stringify({ branch: '//test' });
+    mockReadFile.mockResolvedValue(utf16le(json));
+
+    const v = await detectGameVersion({ installPath: '/games/SN2' });
+
+    expect(v).toBeNull();
+  });
 });
 
 describe('listModDirs', () => {

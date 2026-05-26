@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { fs, selectors, types } from 'vortex-api';
 
 const GAME_ID = 'subnautica2';
@@ -25,6 +26,24 @@ function resolveUE4SSModsDir(api: types.IExtensionApi): string | undefined {
   const gameDir = isXbox ? '' : 'Subnautica2';
   const parts = [d.path, gameDir, 'Binaries', arch, 'ue4ss', 'Mods'].filter(s => s.length > 0);
   return parts.join('/');
+}
+
+// Subnautica 2 ships a UTF-16LE version.json at the game root with build
+// metadata. GDL's declarative fileVersion reads UTF-8, so we need a hook.
+export async function detectGameVersion(ctx: {
+  installPath: string;
+}): Promise<string | null> {
+  try {
+    const buf = await readFile(`${ctx.installPath}/version.json`);
+    const text = buf.toString('utf16le').replace(/^\uFEFF/, '');
+    const json = JSON.parse(text) as { build_number?: number; changelist?: number };
+    if (json.build_number != null && json.changelist != null) {
+      return `${json.build_number}.${json.changelist}`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export async function listModDirs(modsDir: string): Promise<string[]> {

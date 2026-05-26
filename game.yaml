@@ -197,6 +197,9 @@ installers:
     placeAt: "${pakModsPath}"
     modType: subnautica2-pak
 
+discovery:
+  version: { hook: detectGameVersion }
+
 setup:
   ensureDirs:
     - ${pakModsPath}
