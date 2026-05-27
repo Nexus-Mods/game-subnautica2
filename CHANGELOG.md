@@ -1,23 +1,25 @@
 # Changelog
 
-## 1.1.0 — 2026-05-26
+## 1.1.0 — 2026-05-27
 
 ### Breaking
 
-- **Rewritten with GDL** — The entire extension is now declared in `game.yaml` using [Game Description Language](https://github.com/Nexus-Mods/game-description-language). All hand-coded TypeScript installer/routing logic has been replaced by declarative YAML rules. The only remaining custom code is `src/hooks.ts` for `regenerateModsTxt`.
+- **Rewritten with GDL** — The entire extension is now declared in `game.yaml` using [Game Description Language](https://github.com/Nexus-Mods/game-description-language). All hand-coded TypeScript installer/routing logic has been replaced by declarative YAML rules. The only remaining custom code is `src/hooks.ts` for lifecycle hooks.
 
 ### New
 
+- **Game version detection** — Reads `version.json` (UTF-16LE) from the game root and reports the build number and changelist (e.g., `63.114707`).
 - **Bare Lua mod support** — Added `ue4ss-lua-bare` installer for UE4SS mods that place `.lua` files directly in the mod folder without a `Scripts/` subdirectory (e.g., FishSizeRandomizer).
 - **IO Store only installer** — Dedicated `pak-iostore` installer for mods with `.utoc` + `.ucas` files but no `.pak`.
-- **Corpus testing** — Installer rules are validated against real mod archives from NexusMods (17/17 validators pass, 21/24 archives matched).
+- **Corpus testing** — Installer rules are validated against real mod archives from NexusMods (20/20 validators pass, 24/28 archives matched; 4 unmatched are non-auto-installable mod types).
 - **Inline test cases** — 24 test cases defined in `game.yaml` covering all installer routing scenarios.
+- **Vortex game details** — Extension now passes `ignoreConflicts`, `ignoreDeploy`, `supportsSymlinks`, `steamAppId`, `epicAppId`, and `gameProjectFolder` to Vortex via the new GDL `game.details` feature.
 
 ### Improvements
 
-- Reduced codebase from ~1,900 lines of TypeScript to ~500 lines of YAML + 63 lines of hooks.
+- Reduced codebase from ~1,900 lines of TypeScript to ~500 lines of YAML + 80 lines of hooks.
 - Build pipeline simplified: `gdl build` replaces custom webpack config.
-- CI workflow updated for GDL-based build.
+- CI workflow updated for GDL-based build with submodule checkout.
 
 ## 1.0.2 — 2026-05-18
 
