@@ -826,7 +826,7 @@ packages:
     engines: {node: '>=0.10.0'}
 
   vortex-api@https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/e185dfc892ef409490ea53d54bf861d7e02b4cb4:
-    resolution: {gitHosted: true, integrity: sha512-H4U9xND63/NVf69SAP+KTfmc7QJiEaRbZEoTn/GABKVne8Ol97ynkvUqbYp9crYB59RYVYMg61U76xG+maHnFg==, tarball: https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/e185dfc892ef409490ea53d54bf861d7e02b4cb4}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/e185dfc892ef409490ea53d54bf861d7e02b4cb4}
     version: 2.1.0-beta.4
     hasBin: true
     peerDependencies:
