@@ -10,10 +10,10 @@ importers:
     devDependencies:
       vitest:
         specifier: ^3.0.0
-        version: 3.2.4(@types/node@20.19.41)(terser@5.47.1)
+        version: 3.2.4
       vortex-api:
         specifier: github:Nexus-Mods/vortex-api
-        version: https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/6f7abb537ab9c6a229790baa84b8273206d132bf(@types/bluebird@3.5.20)(bluebird@3.7.2)(fs-extra@9.1.0)(immutability-helper@3.1.1)(minimatch@3.1.5)(react-bootstrap@0.33.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react-i18next@11.18.6(i18next@26.1.0(typescript@5.9.3))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-redux@7.2.9(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-select@1.3.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(redux-act@1.8.0)(redux-thunk@2.4.2(redux@4.2.1))(relaxed-json@1.0.3)(semver@7.7.4)(string-template@1.0.0)(uuid@3.4.0)(xml2js@0.5.0)
+        version: https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/6f7abb537ab9c6a229790baa84b8273206d132bf(@types/bluebird@3.5.20)(bluebird@3.7.2)(fs-extra@9.1.0)(immutability-helper@3.1.1)(minimatch@3.1.5)(react-bootstrap@0.33.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react-i18next@11.18.6(i18next@26.1.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-redux@7.2.9(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-select@1.3.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(redux-act@1.8.0)(redux-thunk@2.4.2(redux@4.2.1))(relaxed-json@1.0.3)(semver@7.7.4)(string-template@1.0.0)(uuid@3.4.0)(xml2js@0.5.0)
 
 packages:
 
@@ -181,21 +181,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@jridgewell/gen-mapping@0.3.13':
-    resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
-
-  '@jridgewell/resolve-uri@3.1.2':
-    resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
-    engines: {node: '>=6.0.0'}
-
-  '@jridgewell/source-map@0.3.11':
-    resolution: {integrity: sha512-ZMp1V8ZFcPG5dIWnQLr3NSI1MiCU7UETdS/A0G8V/XWHvJv3ZsFqutJn1Y5RPmAPX6F3BiE397OqveU/9NCuIA==}
-
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
-  '@jridgewell/trace-mapping@0.3.31':
-    resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     resolution: {integrity: sha512-x35CNW/ANXG3hE/EZpRU8MXX1JDN86hBb2wMGAtltkz7pc6cxgjpy1OMMfDosOQ+2hWqIkag/fGok1Yady9nGw==}
@@ -355,9 +342,6 @@ packages:
     peerDependencies:
       '@types/react': '*'
 
-  '@types/node@20.19.41':
-    resolution: {integrity: sha512-ECymXOukMnOoVkC2bb1Vc/w/836DXncOg5m8Xj1RH7xSHZJWNYY6Zh7EH477vcnD5egKNNfy2RpNOmuChhFPgQ==}
-
   '@types/react-redux@7.1.34':
     resolution: {integrity: sha512-GdFaVjEbYv4Fthm2ZLvj1VSCedV7TqE5y1kNwnjSdBOTXuRSgowux6J8TAct15T3CKBr63UMk+2CO7ilRhyrAQ==}
 
@@ -393,11 +377,6 @@ packages:
   '@vitest/utils@3.2.4':
     resolution: {integrity: sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA==}
 
-  acorn@8.16.0:
-    resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
-
   ansi-styles@3.2.1:
     resolution: {integrity: sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==}
     engines: {node: '>=4'}
@@ -418,9 +397,6 @@ packages:
 
   brace-expansion@1.1.14:
     resolution: {integrity: sha512-MWPGfDxnyzKU7rNOW9SP/c50vi3xrmrua/+6hfPbCS2ABNWfx24vPidzvC7krjU/RTo235sV776ymlsMtGKj8g==}
-
-  buffer-from@1.1.2:
-    resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
   cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
@@ -720,13 +696,6 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
-  source-map-support@0.5.21:
-    resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
-
-  source-map@0.6.1:
-    resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
-    engines: {node: '>=0.10.0'}
-
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
 
@@ -742,11 +711,6 @@ packages:
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
     engines: {node: '>=4'}
-
-  terser@5.47.1:
-    resolution: {integrity: sha512-tPbLXTI6ohPASb/1YViL428oEHu6/qv1OxqYnfaonVCFHqx4+wCd95pHrQWsL5X4pl90CTyW9piSAsS2L0VoMw==}
-    engines: {node: '>=10'}
-    hasBin: true
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -770,18 +734,10 @@ packages:
     resolution: {integrity: sha512-azl+t0z7pw/z958Gy9svOTuzqIk6xq+NSheJzn5MMWtWTFywIacg2wUlzKFGtt3cthx0r2SxMK0yzJOR0IES7Q==}
     engines: {node: '>=14.0.0'}
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   uncontrollable@7.2.1:
     resolution: {integrity: sha512-svtcfoTADIB0nT9nltgjujTi7BzVmwjZClOmskKu/E8FW9BXzg9os8OLr4f8Dlnk0rYWJIWr4wv9eKUXiQvQwQ==}
     peerDependencies:
       react: '>=15.0.0'
-
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
@@ -870,7 +826,7 @@ packages:
     engines: {node: '>=0.10.0'}
 
   vortex-api@https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/6f7abb537ab9c6a229790baa84b8273206d132bf:
-    resolution: {integrity: sha512-QmNlmy75njp/KvJeoDKX7iKdmRKWN7iBML7ycAMBzmMwjn63dIgZY2Cw6000pXVmYa6iOxbnX6B8Z5aG9VmqiQ==, tarball: https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/6f7abb537ab9c6a229790baa84b8273206d132bf}
+    resolution: {gitHosted: true, integrity: sha512-QmNlmy75njp/KvJeoDKX7iKdmRKWN7iBML7ycAMBzmMwjn63dIgZY2Cw6000pXVmYa6iOxbnX6B8Z5aG9VmqiQ==, tarball: https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/6f7abb537ab9c6a229790baa84b8273206d132bf}
     version: 2.0.1
     hasBin: true
     peerDependencies:
@@ -997,28 +953,7 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@jridgewell/gen-mapping@0.3.13':
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
-      '@jridgewell/trace-mapping': 0.3.31
-    optional: true
-
-  '@jridgewell/resolve-uri@3.1.2':
-    optional: true
-
-  '@jridgewell/source-map@0.3.11':
-    dependencies:
-      '@jridgewell/gen-mapping': 0.3.13
-      '@jridgewell/trace-mapping': 0.3.31
-    optional: true
-
   '@jridgewell/sourcemap-codec@1.5.5': {}
-
-  '@jridgewell/trace-mapping@0.3.31':
-    dependencies:
-      '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.5
-    optional: true
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     optional: true
@@ -1113,11 +1048,6 @@ snapshots:
       '@types/react': 19.2.14
       hoist-non-react-statics: 3.3.2
 
-  '@types/node@20.19.41':
-    dependencies:
-      undici-types: 6.21.0
-    optional: true
-
   '@types/react-redux@7.1.34':
     dependencies:
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.2.14)
@@ -1137,13 +1067,13 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.4(vite@7.3.3(@types/node@20.19.41)(terser@5.47.1))':
+  '@vitest/mocker@3.2.4(vite@7.3.3)':
     dependencies:
       '@vitest/spy': 3.2.4
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.3(@types/node@20.19.41)(terser@5.47.1)
+      vite: 7.3.3
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -1171,9 +1101,6 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 2.0.0
 
-  acorn@8.16.0:
-    optional: true
-
   ansi-styles@3.2.1:
     dependencies:
       color-convert: 1.9.3
@@ -1190,9 +1117,6 @@ snapshots:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
-
-  buffer-from@1.1.2:
-    optional: true
 
   cac@6.7.14: {}
 
@@ -1303,9 +1227,7 @@ snapshots:
     dependencies:
       void-elements: 3.1.0
 
-  i18next@26.1.0(typescript@5.9.3):
-    optionalDependencies:
-      typescript: 5.9.3
+  i18next@26.1.0: {}
 
   immutability-helper@3.1.1: {}
 
@@ -1396,11 +1318,11 @@ snapshots:
       react: 16.14.0
       scheduler: 0.19.1
 
-  react-i18next@11.18.6(i18next@26.1.0(typescript@5.9.3))(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
+  react-i18next@11.18.6(i18next@26.1.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.29.2
       html-parse-stringify: 3.0.1
-      i18next: 26.1.0(typescript@5.9.3)
+      i18next: 26.1.0
       react: 16.14.0
     optionalDependencies:
       react-dom: 16.14.0(react@16.14.0)
@@ -1526,15 +1448,6 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
-  source-map-support@0.5.21:
-    dependencies:
-      buffer-from: 1.1.2
-      source-map: 0.6.1
-    optional: true
-
-  source-map@0.6.1:
-    optional: true
-
   stackback@0.0.2: {}
 
   std-env@3.10.0: {}
@@ -1548,14 +1461,6 @@ snapshots:
   supports-color@5.5.0:
     dependencies:
       has-flag: 3.0.0
-
-  terser@5.47.1:
-    dependencies:
-      '@jridgewell/source-map': 0.3.11
-      acorn: 8.16.0
-      commander: 2.20.3
-      source-map-support: 0.5.21
-    optional: true
 
   tinybench@2.9.0: {}
 
@@ -1572,9 +1477,6 @@ snapshots:
 
   tinyspy@4.0.4: {}
 
-  typescript@5.9.3:
-    optional: true
-
   uncontrollable@7.2.1(react@16.14.0):
     dependencies:
       '@babel/runtime': 7.29.2
@@ -1583,20 +1485,17 @@ snapshots:
       react: 16.14.0
       react-lifecycles-compat: 3.0.4
 
-  undici-types@6.21.0:
-    optional: true
-
   universalify@2.0.1: {}
 
   uuid@3.4.0: {}
 
-  vite-node@3.2.4(@types/node@20.19.41)(terser@5.47.1):
+  vite-node@3.2.4:
     dependencies:
       cac: 6.7.14
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.3.3(@types/node@20.19.41)(terser@5.47.1)
+      vite: 7.3.3
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -1611,7 +1510,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite@7.3.3(@types/node@20.19.41)(terser@5.47.1):
+  vite@7.3.3:
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -1620,15 +1519,13 @@ snapshots:
       rollup: 4.60.3
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@types/node': 20.19.41
       fsevents: 2.3.3
-      terser: 5.47.1
 
-  vitest@3.2.4(@types/node@20.19.41)(terser@5.47.1):
+  vitest@3.2.4:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.3.3(@types/node@20.19.41)(terser@5.47.1))
+      '@vitest/mocker': 3.2.4(vite@7.3.3)
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -1646,11 +1543,9 @@ snapshots:
       tinyglobby: 0.2.16
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 7.3.3(@types/node@20.19.41)(terser@5.47.1)
-      vite-node: 3.2.4(@types/node@20.19.41)(terser@5.47.1)
+      vite: 7.3.3
+      vite-node: 3.2.4
       why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 20.19.41
     transitivePeerDependencies:
       - jiti
       - less
@@ -1667,7 +1562,7 @@ snapshots:
 
   void-elements@3.1.0: {}
 
-  vortex-api@https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/6f7abb537ab9c6a229790baa84b8273206d132bf(@types/bluebird@3.5.20)(bluebird@3.7.2)(fs-extra@9.1.0)(immutability-helper@3.1.1)(minimatch@3.1.5)(react-bootstrap@0.33.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react-i18next@11.18.6(i18next@26.1.0(typescript@5.9.3))(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-redux@7.2.9(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-select@1.3.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(redux-act@1.8.0)(redux-thunk@2.4.2(redux@4.2.1))(relaxed-json@1.0.3)(semver@7.7.4)(string-template@1.0.0)(uuid@3.4.0)(xml2js@0.5.0):
+  vortex-api@https://codeload.github.com/Nexus-Mods/vortex-api/tar.gz/6f7abb537ab9c6a229790baa84b8273206d132bf(@types/bluebird@3.5.20)(bluebird@3.7.2)(fs-extra@9.1.0)(immutability-helper@3.1.1)(minimatch@3.1.5)(react-bootstrap@0.33.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-dom@16.14.0(react@16.14.0))(react-i18next@11.18.6(i18next@26.1.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-redux@7.2.9(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react-select@1.3.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(redux-act@1.8.0)(redux-thunk@2.4.2(redux@4.2.1))(relaxed-json@1.0.3)(semver@7.7.4)(string-template@1.0.0)(uuid@3.4.0)(xml2js@0.5.0):
     dependencies:
       '@types/bluebird': 3.5.20
       bluebird: 3.7.2
@@ -1676,7 +1571,7 @@ snapshots:
       minimatch: 3.1.5
       react-bootstrap: 0.33.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-dom: 16.14.0(react@16.14.0)
-      react-i18next: 11.18.6(i18next@26.1.0(typescript@5.9.3))(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
+      react-i18next: 11.18.6(i18next@26.1.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-redux: 7.2.9(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       react-select: 1.3.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       redux-act: 1.8.0
