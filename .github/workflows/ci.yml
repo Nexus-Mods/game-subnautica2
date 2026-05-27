@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: pnpm/action-setup@v4
 
@@ -21,11 +23,15 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint
-      - run: pnpm run typecheck
-      - run: pnpm test
-      - run: pnpm run build
-      - run: pnpm run gen-info
+
+      - name: Build GDL toolchain
+        run: cd gdl && pnpm install --frozen-lockfile && pnpm run build
+
+      - name: Build extension
+        run: pnpm run build
+
+      - name: Run tests
+        run: npx vitest run
 
       - uses: actions/upload-artifact@v4
         with:
@@ -46,6 +52,8 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: pnpm/action-setup@v4
 
@@ -55,6 +63,9 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Build GDL toolchain
+        run: cd gdl && pnpm install --frozen-lockfile && pnpm run build
 
       - name: Verify tag matches package.json version
         id: meta
@@ -68,7 +79,8 @@ jobs:
           echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
           echo "zip_name=subnautica2-vortex-v${PKG_VERSION}.zip" >> "$GITHUB_OUTPUT"
 
-      - run: pnpm run package
+      - name: Package extension
+        run: node gdl/dist/cli.js package
 
       - uses: softprops/action-gh-release@v2
         with:

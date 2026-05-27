@@ -1,9 +1,10 @@
 node_modules/
 dist/
 out/
+.gdl-out/
+tests/cache/
 info.json
 *.7z
 *.log
 .DS_Store
 coverage/
-.eslintcache
