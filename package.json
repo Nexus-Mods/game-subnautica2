@@ -10,8 +10,7 @@
     "node": ">=22"
   },
   "pnpm": {
-    "ignoredBuiltDependencies": [
-      "core-js",
+    "onlyBuiltDependencies": [
       "esbuild"
     ]
   },
