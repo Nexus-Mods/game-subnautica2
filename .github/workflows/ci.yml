@@ -22,6 +22,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - run: pnpm approve-builds core-js esbuild
       - run: pnpm install --frozen-lockfile
 
       - name: Build GDL toolchain
@@ -62,6 +63,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - run: pnpm approve-builds core-js esbuild
       - run: pnpm install --frozen-lockfile
 
       - name: Build GDL toolchain
